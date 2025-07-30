@@ -10,8 +10,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        body: ['"Space Grotesk"', 'sans-serif'],
+        headline: ['"Space Grotesk"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -88,12 +88,48 @@ export default {
             height: '0',
           },
         },
+        'fade-in-up': {
+          '0%': {
+            opacity: '0',
+            transform: 'translateY(20px)',
+          },
+          '100%': {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        'tilt': {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '50%': { transform: 'rotate(0.5deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
+        'tilt': 'tilt 10s infinite linear',
       },
+      animationDelay: {
+        '300': '300ms',
+        '600': '600ms',
+        '900': '900ms',
+      }
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'),
+    function ({ addUtilities, theme }: {addUtilities: any, theme: any}) {
+      const newUtilities = {
+        '.animation-delay-300': {
+          'animation-delay': '300ms',
+        },
+        '.animation-delay-600': {
+          'animation-delay': '600ms',
+        },
+        '.animation-delay-900': {
+          'animation-delay': '900ms',
+        },
+      }
+      addUtilities(newUtilities, ['responsive', 'hover'])
+    }
+  ],
 } satisfies Config;
