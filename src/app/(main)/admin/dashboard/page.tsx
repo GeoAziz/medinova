@@ -113,7 +113,7 @@ export default function AdminDashboard() {
                         <defs><linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/></linearGradient></defs>
                         <XAxis dataKey="month" tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" fontSize={12} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                        <AreaChart type="monotone" dataKey="users" stroke="hsl(var(--primary))" fill="url(#fillUsers)" />
+                        <AreaChartIcon type="monotone" dataKey="users" stroke="hsl(var(--primary))" fill="url(#fillUsers)" />
                     </AreaChart>
                 </ChartContainer>
             </CardContent>
