@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // This is to prevent the build from failing due to optional dependencies.
+    config.externals.push('@opentelemetry/exporter-jaeger');
+    config.externals.push('@genkit-ai/firebase');
+    return config;
+  },
 };
 
 export default nextConfig;
