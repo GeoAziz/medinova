@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
-import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Calendar } from '@/components/ui/calendar';

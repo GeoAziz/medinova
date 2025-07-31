@@ -7,8 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockAdmin, mockDoctorApplications, mockUserList, mockSystemLogs } from '@/lib/data';
-import { AreaChart, Check, Users, X } from 'lucide-react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, AreaChart as RechartsAreaChart, CartesianGrid, XAxis } from '@/components/ui/chart';
+import { AreaChart as AreaChartIcon, Check, Users, X } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 const chartData = [
   { month: 'January', users: 186 },
@@ -108,12 +109,12 @@ export default function AdminDashboard() {
                     </div>
                 </div>
                 <ChartContainer config={chartConfig} className="h-[150px] w-full">
-                    <RechartsAreaChart data={chartData} margin={{ left: -20, right: 10, top: 10, bottom: -10 }}>
+                    <AreaChart data={chartData} margin={{ left: -20, right: 10, top: 10, bottom: -10 }}>
                         <defs><linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/><stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.1}/></linearGradient></defs>
                         <XAxis dataKey="month" tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" fontSize={12} />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                         <AreaChart type="monotone" dataKey="users" stroke="hsl(var(--primary))" fill="url(#fillUsers)" />
-                    </RechartsAreaChart>
+                    </AreaChart>
                 </ChartContainer>
             </CardContent>
           </GlowingCard>
