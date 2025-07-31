@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { mockAdmin, mockDoctorApplications, mockUserList, mockSystemLogs } from '@/lib/data';
 import { Check, Users, X } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AreaChart, CartesianGrid, XAxis, Area } from 'recharts';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 
 const chartData = [
   { month: 'January', users: 186 },
