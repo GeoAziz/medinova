@@ -9,10 +9,15 @@ import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 
 import SplashPreloader from './components/SplashPreloader';
-import Splash3DBackground from './components/Splash3DBackground';
 import GlitchScanlineOverlay from './components/GlitchScanlineOverlay';
 import TerminalTypeText from './components/TerminalTypeText';
 // import { useSplashSounds } from './components/useSplashSounds'; // Immersive sounds feature commented out for future implementation
+
+// Dynamically import the 3D background component with SSR turned off.
+// This is the key to fixing the ReactCurrentOwner error.
+const Splash3DBackground = dynamic(() => import('./components/Splash3DBackground'), {
+  ssr: false,
+});
 
 
 const InteractiveGrid = () => {
@@ -100,5 +105,6 @@ const InteractiveGrid = () => {
   };
   
   export default Page;
+
 
 
