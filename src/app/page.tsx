@@ -10,14 +10,6 @@ import { useEffect, useRef, useState } from 'react';
 import SplashPreloader from './components/SplashPreloader';
 import GlitchScanlineOverlay from './components/GlitchScanlineOverlay';
 import TerminalTypeText from './components/TerminalTypeText';
-// import { useSplashSounds } from './components/useSplashSounds'; // Immersive sounds feature commented out for future implementation
-
-// Dynamically import the 3D background component with SSR turned off.
-// This is the key to fixing the ReactCurrentOwner error.
-const Splash3DBackground = dynamic(() => import('./components/Splash3DBackground'), {
-  ssr: false,
-});
-
 
 const InteractiveGrid = () => {
   // Mouse-reactive grid overlay
@@ -43,13 +35,8 @@ const InteractiveGrid = () => {
     />
   );
 };
-
-
-
-  // Immersive sounds feature is commented out for future implementation
-  // const { playSwoosh, playClick } = useSplashSounds(preloaderDone);
   
-  const Page = () => {
+const Page = () => {
     const [preloaderDone, setPreloaderDone] = useState(false);
   
     return (
@@ -57,11 +44,7 @@ const InteractiveGrid = () => {
         {!preloaderDone && <SplashPreloader onFinish={() => setPreloaderDone(true)} />}
         {preloaderDone && (
           <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background p-4">
-            {/* 3D DNA background */}
-            <Splash3DBackground />
-            {/* Interactive grid overlay */}
             <InteractiveGrid />
-            {/* Glitch/scanline overlay */}
             <GlitchScanlineOverlay />
   
             <main className="z-10 flex flex-col items-center justify-center text-center">
@@ -71,7 +54,6 @@ const InteractiveGrid = () => {
               <div className="mt-2 text-lg text-primary-foreground/80 md:text-xl animate-fade-in-up animation-delay-300">
                 <TerminalTypeText text="Revolutionizing Health Access with AI and Immersion" />
               </div>
-              {/* Immersive sounds feature is commented out for future implementation */}
               <Link href="/auth" className="mt-12">
                 <Button
                   size="lg"
