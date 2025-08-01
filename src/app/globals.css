@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 33% 11%;
+    --foreground: 210 40% 98%;
+    
+    --card: 218 33% 14%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 218 33% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 100% 64%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 279 52% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 217 100% 64%;
+
+    --radius: 0.5rem;
+    
+    --chart-1: 217 100% 64%;
+    --chart-2: 279 52% 60%;
+    --chart-3: 160 60% 45%;
+    --chart-4: 30 80% 55%;
+    --chart-5: 280 65% 60%;
+  }
+
+  .dark {
+    --background: 220 33% 11%;
+    --foreground: 210 40% 98%;
+    
+    --card: 218 33% 14%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 218 33% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 100% 64%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 217 33% 20%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 279 52% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 217 100% 64%;
+
+    --chart-1: 217 100% 64%;
+    --chart-2: 279 52% 60%;
+    --chart-3: 160 60% 45%;
+    --chart-4: 30 80% 55%;
+    --chart-5: 280 65% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .bg-grid-pattern {
+     background-image:
+      linear-gradient(to right, hsl(var(--primary) / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--primary) / 0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .chat-bubble-sent {
+    @apply bg-primary/80 rounded-lg rounded-br-none;
+  }
+  .chat-bubble-received {
+    @apply bg-secondary rounded-lg rounded-bl-none;
+  }
+}

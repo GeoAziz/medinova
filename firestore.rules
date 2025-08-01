@@ -1,0 +1,101 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions to check the user's role from their auth token claim
+    function isAdmin() {
+      return request.auth.token.role == "admin";
+    }
+    function isDoctor() {
+      return request.auth.token.role == "doctor";
+    }
+    function isPatient() {
+      return request.auth.token.role == "patient";
+    }
+    function isNurse() {
+        return request.auth.token.role == "nurse";
+    }
+    function isLabScientist() {
+        return request.auth.token.role == "lab_scientist";
+    }
+    function isPharmacist() {
+        return request.auth.token.role == "pharmacist";
+    }
+     function isReceptionist() {
+        return request.auth.token.role == "receptionist";
+    }
+    function isRadiologist() {
+        return request.auth.token.role == "radiologist";
+    }
+    function isMedicalRecordsOfficer() {
+        return request.auth.token.role == "medical_records_officer";
+    }
+
+    // ================================================
+    // 🔷 ZIZO_MEDIVERSE: Main Medical Platform Rules
+    // ================================================
+
+    // The /users collection stores public-readable profile information.
+    match /users/{userId} {
+      // Any authenticated user can read their own profile.
+      allow get, update: if request.auth.uid == userId;
+      // Admins can read the list of all users for the dashboard.
+      allow list: if isAdmin();
+      // Any authenticated user can create their own profile document.
+      allow create: if request.auth != null;
+    }
+
+    match /appointments/{appointmentId} {
+      allow create: if isPatient() || isReceptionist();
+      allow read, list: if isDoctor() || isReceptionist() || isPatient();
+      allow update, delete: if isDoctor() || isReceptionist();
+    }
+
+    match /medicalRecords/{recordId} {
+      allow read, write: if isDoctor() || isNurse() || isLabScientist() || isRadiologist() || isMedicalRecordsOfficer();
+    }
+
+    match /labReports/{reportId} {
+      allow create, read, update: if isLabScientist();
+      allow read: if isDoctor() || isPatient();
+    }
+
+    match /radiologyScans/{scanId} {
+      allow create, read, update: if isRadiologist();
+      allow read: if isDoctor() || isPatient();
+    }
+
+    match /prescriptions/{prescriptionId} {
+      allow create, update: if isDoctor();
+      allow read: if isPharmacist() || isPatient();
+    }
+
+    match /inventory/{itemId} {
+      allow read, write: if isPharmacist();
+    }
+
+    match /checkIns/{checkInId} {
+      allow read, create: if isReceptionist();
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if isNurse();
+    }
+
+    // Only Admins can read the list of system logs. No one can write them directly.
+    match /systemLogs/{logId} {
+      allow get, list: if isAdmin();
+      allow write: if false; // Should be written by backend functions only
+    }
+
+    match /analytics/{metricId} {
+      allow read: if isAdmin();
+    }
+
+    // Fallback rule: deny all access to any other collections
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}
