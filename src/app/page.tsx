@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -105,6 +104,3 @@ const InteractiveGrid = () => {
   };
   
   export default Page;
-
-
-
