@@ -3,14 +3,6 @@ import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-<<<<<<< HEAD
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Bot, CalendarPlus } from 'lucide-react';
-import { mockPatient, mockAppointments } from '@/lib/data';
-
-export default function PatientDashboard() {
-  const upcomingAppointments = mockAppointments.filter(a => a.status === 'Upcoming');
-=======
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,32 +12,10 @@ import { mockPatient, mockAppointments, mockPrescriptions, mockMedicalHistory } 
 export default function PatientDashboard() {
   const upcomingAppointments = mockAppointments.filter(a => a.status === 'Upcoming');
   const pastAppointments = mockAppointments.filter(a => a.status === 'Past');
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 
   return (
     <div className="animate-fade-in-up">
       <PageHeader
-<<<<<<< HEAD
-        title={`Health Overview`}
-        description={`Welcome back, ${mockPatient.name}. Here is your health summary.`}
-      />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <GlowingCard>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Recent Appointments</CardTitle>
-                <Link href="/patient/book-appointment">
-                    <Button>
-                      <CalendarPlus className="mr-2 h-4 w-4" />
-                      Book Appointment
-                    </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-               <Table>
-=======
         title={`Welcome, ${mockPatient.name}`}
         description="Here's your personal health overview."
       />
@@ -72,7 +42,6 @@ export default function PatientDashboard() {
                 </div>
                 <TabsContent value="upcoming" className="mt-4">
                   <Table>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                     <TableHeader>
                       <TableRow>
                         <TableHead>Doctor</TableHead>
@@ -92,8 +61,6 @@ export default function PatientDashboard() {
                       ))}
                     </TableBody>
                   </Table>
-<<<<<<< HEAD
-=======
                 </TabsContent>
                 <TabsContent value="past" className="mt-4">
                   <Table>
@@ -138,22 +105,10 @@ export default function PatientDashboard() {
                   </AccordionItem>
                 ))}
               </Accordion>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
             </CardContent>
           </GlowingCard>
         </div>
 
-<<<<<<< HEAD
-        <div className="space-y-6">
-           <GlowingCard>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Bot /> AI Assistant</CardTitle>
-              <CardDescription>Your personal AI health guide.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Get answers to your health questions, summarize your records, and more.</p>
-              <Button className="w-full mt-4">Launch AI Assistant</Button>
-=======
         {/* Right Column */}
         <div className="space-y-6">
           <GlowingCard>
@@ -188,7 +143,6 @@ export default function PatientDashboard() {
                   ))}
                 </TableBody>
               </Table>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
             </CardContent>
           </GlowingCard>
         </div>

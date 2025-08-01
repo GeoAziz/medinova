@@ -1,15 +1,8 @@
-<<<<<<< HEAD
 
 'use client';
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-=======
-'use client';
-
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 import {
   SidebarProvider,
   Sidebar,
@@ -27,7 +20,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '../ui/button';
 import {
   Home,
-<<<<<<< HEAD
   LogOut,
   Bell,
   Shield,
@@ -66,59 +58,29 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useToast } from '@/hooks/use-toast';
-=======
-  Calendar,
-  FileText,
-  Stethoscope,
-  Users,
-  MessageSquare,
-  Shield,
-  AreaChart,
-  GitBranch,
-  Settings,
-  LogOut,
-  Bell,
-  Bot,
-  User,
-} from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { Badge } from '../ui/badge';
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 
 type NavItem = {
   href: string;
   label: string;
   icon: React.ElementType;
-<<<<<<< HEAD
   disabled?: boolean;
-=======
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 };
 
 const patientNav: NavItem[] = [
   { href: '/patient/dashboard', label: 'Dashboard', icon: Home },
-<<<<<<< HEAD
   { href: '/patient/visualization', label: 'HoloMed Hub', icon: Microscope },
   { href: '/patient/book-appointment', label: 'Book Appointment', icon: CalendarDays },
-=======
-  { href: '/patient/book-appointment', label: 'Book Appointment', icon: Calendar },
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
   { href: '/chat', label: 'Messages', icon: MessageSquare },
 ];
 
 const doctorNav: NavItem[] = [
-<<<<<<< HEAD
   { href: '/doctor/dashboard', label: 'Dashboard', icon: Stethoscope },
   { href: '/doctor/diagnostics', label: 'Diagnostics', icon: FlaskConical },
-=======
-  { href: '/doctor/dashboard', label: 'Dashboard', icon: Home },
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
   { href: '/chat', label: 'Messages', icon: MessageSquare },
 ];
 
 const adminNav: NavItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: Shield },
-<<<<<<< HEAD
   { href: '/admin/patients', label: 'Patients', icon: Users },
   { href: '/admin/doctors', label: 'Doctors', icon: Stethoscope },
   { href: '/admin/nurses', label: 'Nurses', icon: HeartPulse },
@@ -190,19 +152,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   
   let navItems: NavItem[] = [];
   let userRole: 'Patient' | 'Doctor' | 'Admin' | 'Lab Scientist' | 'Nurse' | 'Pharmacist' | 'Receptionist' | 'Radiologist' | 'Medical Records Officer' = 'Patient';
-=======
-];
-
-const bottomNav = [
-  { href: '#', label: 'Settings', icon: Settings },
-];
-
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  
-  let navItems: NavItem[] = [];
-  let userRole: 'Patient' | 'Doctor' | 'Admin' = 'Patient';
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
   let userName = 'Alex Ryder';
   let userInitial = 'AR';
   
@@ -216,7 +165,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     userRole = 'Admin';
     userName = 'SysAdmin';
     userInitial = 'SA';
-<<<<<<< HEAD
   } else if (pathname.startsWith('/lab')) {
     navItems = labNav;
     userRole = 'Lab Scientist';
@@ -247,8 +195,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     userRole = 'Medical Records Officer';
     userName = 'Officer Z-X9';
     userInitial = 'ZX';
-=======
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
   } else {
     navItems = patientNav;
     userRole = 'Patient';
@@ -258,7 +204,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   const isActive = (href: string) => pathname === href;
 
-<<<<<<< HEAD
   const handleLogout = () => {
     toast({
         title: 'Logged Out',
@@ -274,15 +219,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <Logo className="w-32" />
-=======
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar>
-          <SidebarHeader>
-            <div className="flex items-center gap-2">
-              <Logo className="w-24" />
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
               <SidebarTrigger className="ml-auto" />
             </div>
           </SidebarHeader>
@@ -291,18 +227,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <Link href={item.href}>
-<<<<<<< HEAD
                     <SidebarMenuButton isActive={isActive(item.href)} tooltip={item.label} disabled={item.disabled}>
                       <item.icon />
                       <span>{item.label}</span>
-=======
-                    <SidebarMenuButton isActive={isActive(item.href)} tooltip={item.label}>
-                      <item.icon />
-                      <span>{item.label}</span>
-                       {item.label === 'Messages' && (
-                        <Badge variant="destructive" className="ml-auto group-data-[collapsible=icon]:hidden">1</Badge>
-                       )}
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                     </SidebarMenuButton>
                   </Link>
                 </SidebarMenuItem>
@@ -311,45 +238,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SidebarContent>
           <SidebarFooter>
              <SidebarMenu>
-<<<<<<< HEAD
               <SidebarMenuItem>
                  <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
                     <LogOut />
                     <span>Logout</span>
                   </SidebarMenuButton>
-=======
-              {bottomNav.map((item) => (
-                  <SidebarMenuItem key={item.label}>
-                    <Link href={item.href}>
-                      <SidebarMenuButton tooltip={item.label}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </SidebarMenuButton>
-                    </Link>
-                  </SidebarMenuItem>
-              ))}
-              <SidebarMenuItem>
-                 <Link href="/auth">
-                  <SidebarMenuButton tooltip="Logout">
-                    <LogOut />
-                    <span>Logout</span>
-                  </SidebarMenuButton>
-                 </Link>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
               </SidebarMenuItem>
              </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-<<<<<<< HEAD
             <header className="sticky top-0 z-30 flex h-16 items-center justify-end gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-=======
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
-                <div className="flex items-center gap-4">
-                  <SidebarTrigger className="md:hidden" />
-                  <h1 className="text-xl font-semibold">{userRole} Portal</h1>
-                </div>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                 <div className="flex items-center gap-4">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -364,37 +263,21 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                         <div className="space-y-2">
                           <h4 className="font-medium leading-none">Notifications</h4>
                           <p className="text-sm text-muted-foreground">
-<<<<<<< HEAD
                             You have 1 new message.
-=======
-                            You have 2 new messages.
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                           </p>
                         </div>
                         <div className="text-sm">
                            <p>Your appointment with Dr. Reed is confirmed.</p>
-<<<<<<< HEAD
-=======
-                           <p className="mt-2">New message from Dr. Tanaka.</p>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                         </div>
                       </div>
                     </PopoverContent>
                   </Popover>
-<<<<<<< HEAD
                   <div className="flex items-center gap-3">
-=======
-                  <div className="flex items-center gap-2">
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                     <Avatar className="h-9 w-9">
                       <AvatarImage src={`https://placehold.co/40x40.png`} alt={userName} data-ai-hint="profile" />
                       <AvatarFallback>{userInitial}</AvatarFallback>
                     </Avatar>
-<<<<<<< HEAD
                     <div className="hidden flex-col text-right md:flex">
-=======
-                    <div className="hidden flex-col md:flex">
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
                         <span className="text-sm font-medium">{userName}</span>
                         <span className="text-xs text-muted-foreground">{userRole}</span>
                     </div>

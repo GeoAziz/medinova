@@ -3,13 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-<<<<<<< HEAD
   title: 'Zizo_MediVerse',
   description: 'Revolutionizing Healthcare in a Virtual World',
-=======
-  title: 'MediNova',
-  description: 'A New Era in Virtual Health',
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 };
 
 export default function RootLayout({

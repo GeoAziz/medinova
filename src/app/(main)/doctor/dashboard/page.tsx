@@ -3,85 +3,31 @@ import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-<<<<<<< HEAD
 import { mockDoctor, mockDoctorPatients, mockDoctorSchedule } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { AiAssistantModal } from '@/components/doctor/ai-assistant-modal';
 import { PrescriptionModal } from '@/components/doctor/prescription-modal';
 import Link from 'next/link';
 import { FlaskConical, Stethoscope, BrainCircuit } from 'lucide-react';
-=======
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Bot, FilePlus, Sparkles } from 'lucide-react';
-import { mockDoctor, mockDoctorPatients, mockDoctorSchedule } from '@/lib/data';
-import { PrescriptionModal } from '@/components/doctor/prescription-modal';
-import { AiAssistantModal } from '@/components/doctor/ai-assistant-modal';
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 
 export default function DoctorDashboard() {
   return (
     <div className="animate-fade-in-up">
       <PageHeader
-<<<<<<< HEAD
         title={`Doctor's Console`}
         description={`Welcome, ${mockDoctor.name}. Here are your patients and schedule.`}
         actions={
           <div className="flex gap-2">
             <PrescriptionModal />
             <AiAssistantModal />
-=======
-        title={`Welcome, ${mockDoctor.name}`}
-        description="Here's your overview for today."
-        actions={
-          <div className="flex items-center space-x-2">
-            <Switch id="availability" />
-            <Label htmlFor="availability">Available for new consults</Label>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
           </div>
         }
       />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-<<<<<<< HEAD
         <div className="lg:col-span-2 space-y-6">
           <GlowingCard>
             <CardHeader>
               <CardTitle>Assigned Patients</CardTitle>
-=======
-        {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
-          <GlowingCard>
-            <CardHeader>
-              <CardTitle>Today's Schedule</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Patient</TableHead>
-                    <TableHead>Type</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockDoctorSchedule.map(apt => (
-                    <TableRow key={apt.time}>
-                      <TableCell>{apt.time}</TableCell>
-                      <TableCell>{apt.patient}</TableCell>
-                      <TableCell><Badge variant="secondary">{apt.type}</Badge></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </GlowingCard>
-
-          <GlowingCard>
-            <CardHeader>
-              <CardTitle>Assigned Patients</CardTitle>
-              <CardDescription>Click on a patient to view their profile.</CardDescription>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
             </CardHeader>
             <CardContent>
               <Table>
@@ -109,7 +55,6 @@ export default function DoctorDashboard() {
               </Table>
             </CardContent>
           </GlowingCard>
-<<<<<<< HEAD
           
            <GlowingCard>
               <CardHeader>
@@ -149,23 +94,6 @@ export default function DoctorDashboard() {
                   ))}
                 </TableBody>
               </Table>
-=======
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-6">
-          <GlowingCard>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Bot /> AI Assistant</CardTitle>
-              <CardDescription>Your AI-powered medical co-pilot.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">Leverage AI to summarize history, suggest treatments, and generate notes.</p>
-              <div className="flex flex-col gap-2">
-                <AiAssistantModal />
-                <PrescriptionModal />
-              </div>
->>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
             </CardContent>
           </GlowingCard>
         </div>
