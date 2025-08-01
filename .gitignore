@@ -42,6 +42,10 @@ next-env.d.ts
 
 # firebase
 firebase-debug.log
+<<<<<<< HEAD
 firestore-debug.log
 
 serviceAccountKey.json
+=======
+firestore-debug.log
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6

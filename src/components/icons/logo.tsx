@@ -27,6 +27,7 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
         y="50%"
         dy=".35em"
         fontFamily="'Space Grotesk', sans-serif"
+<<<<<<< HEAD
         fontSize="28"
         fontWeight="700"
         textAnchor="middle"
@@ -35,6 +36,16 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
         style={{ filter: 'url(#glow)', opacity: 0.9 }}
       >
         Zizo_MediVerse
+=======
+        fontSize="32"
+        fontWeight="700"
+        textAnchor="middle"
+        fill="url(#gradient)"
+        className="tracking-wider"
+        style={{ filter: 'url(#glow)', opacity: 0.9 }}
+      >
+        MediNova
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
       </text>
     </svg>
   );

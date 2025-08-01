@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 export type Appointment = {
   id: string;
   doctor: string;
@@ -39,6 +42,7 @@ export type SystemLog = {
   message: string;
 };
 
+<<<<<<< HEAD
 export type LabTest = {
   id: string;
   patientName: string;
@@ -147,6 +151,8 @@ export const mockReceptionistAppointments: ReceptionistAppointment[] = [
     { id: 'apt-r-06', patientName: 'Sofia Rossi', doctorName: 'Dr. Kenji Tanaka', time: '02:00 PM', status: 'Cancelled' },
 ];
 
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 export const mockPatient = {
   name: 'Alex Ryder',
   id: 'PID-001',
@@ -202,12 +208,15 @@ export const mockUserList = [
     { id: 'usr-003', name: 'Jasmine Lee', role: 'Patient', registered: '2023-03-10' },
     { id: 'usr-004', name: 'Dr. Kenji Tanaka', role: 'Doctor', registered: '2023-02-01' },
     { id: 'usr-005', name: 'SysAdmin Unit 734', role: 'Admin', registered: '2022-01-01' },
+<<<<<<< HEAD
     { id: 'usr-006', name: 'Lab Scientist 04', role: 'Lab Scientist', registered: '2023-05-01' },
     { id: 'usr-007', name: 'Nurse Kai', role: 'Nurse', registered: '2023-04-12' },
     { id: 'usr-008', name: 'Riya Singh', role: 'Pharmacist', registered: '2023-06-01' },
     { id: 'usr-009', name: 'Javier Rios', role: 'Receptionist', registered: '2023-07-01' },
     { id: 'usr-010', name: 'Dr. Chloe Benali', role: 'Radiologist', registered: '2023-08-01' },
     { id: 'usr-011', name: 'Officer Z-X9', role: 'Medical Records Officer', registered: '2023-09-01' },
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
 ];
 
 export const mockSystemLogs: SystemLog[] = [
@@ -219,7 +228,11 @@ export const mockSystemLogs: SystemLog[] = [
 
 export const mockAvailableDoctors = [
     { id: 'doc-01', name: 'Dr. Evelyn Reed', specialty: 'Cardiology', avatar: '/avatars/doctor-1.png' },
+<<<<<<< HEAD
     { id: 'doc-02', name: 'Dr. Kenji Tanaka', specialty: 'Neurology', avatar: '/avatars/doctor-3.png' },
+=======
+    { id: 'doc-02', name: 'Dr. Kenji Tanaka', specialty: 'Neurology', avatar: '/avatars/doctor-2.png' },
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
     { id: 'doc-03', name: 'Dr. Anya Sharma', specialty: 'Dermatology', avatar: '/avatars/doctor-3.png' },
     { id: 'doc-04', name: 'Dr. Ben Carter', specialty: 'Orthopedics', avatar: '/avatars/doctor-4.png' },
 ];
@@ -236,6 +249,7 @@ export const mockChatMessages = [
     { id: 'msg-03', sender: 'other', text: 'Excellent. Remember to monitor your blood pressure. We\'ll discuss it at your next appointment.', time: '10:32 AM' },
     { id: 'msg-04', sender: 'me', text: 'Will do. See you on the 15th!', time: '10:33 AM' },
 ]
+<<<<<<< HEAD
 
 export const mockLabTests: LabTest[] = [
     { id: 'LT-001', patientName: 'Alex Ryder', patientId: 'PID-001', testType: 'Complete Blood Count', requestingDoctor: 'Dr. Evelyn Reed', status: 'Pending', receivedDate: '2024-07-30' },
@@ -281,3 +295,5 @@ export const mockPharmacistInventory: PharmacistInventoryItem[] = [
     { id: 'DRG-004', medicationName: 'Amoxicillin 500mg', ndc: '0781-1598-01', quantity: 0, status: 'Out of Stock', lastRestock: '2024-07-05' },
     { id: 'DRG-005', medicationName: 'Metformin 1000mg', ndc: '51079-052-20', quantity: 1500, status: 'In Stock', lastRestock: '2024-07-22' },
 ];
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6

@@ -102,6 +102,7 @@ export default {
           '0%, 100%': { transform: 'rotate(0deg)' },
           '50%': { transform: 'rotate(0.5deg)' },
         },
+<<<<<<< HEAD
         'background-pan': {
           '0%': { 'background-position': '0% 0%' },
           '100%': { 'background-position': '100% 100%' },
@@ -120,15 +121,20 @@ export default {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.8' },
         }
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
         'tilt': 'tilt 10s infinite linear',
+<<<<<<< HEAD
         'background-pan': 'background-pan 15s ease-in-out infinite alternate',
         'pulse-glow': 'pulse-glow 4s infinite ease-in-out',
         'flicker': 'flicker 3s infinite ease-in-out',
+=======
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
       },
       animationDelay: {
         '300': '300ms',

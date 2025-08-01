@@ -3,6 +3,7 @@ import { Logo } from '@/components/icons/logo';
 
 export default function AuthenticationPage() {
   return (
+<<<<<<< HEAD
     <div className="relative grid min-h-screen grid-cols-1 overflow-hidden md:grid-cols-2">
       {/* Left Pane: Visuals */}
       <div className="relative hidden items-center justify-center bg-secondary p-8 md:flex">
@@ -33,6 +34,19 @@ export default function AuthenticationPage() {
           </div>
           <AuthForm />
         </div>
+=======
+    <div className="relative flex min-h-screen flex-col items-center justify-center p-4 overflow-hidden">
+       <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at 15% 25%, hsl(var(--primary) / 0.15), transparent 40%), 
+                            radial-gradient(circle at 85% 75%, hsl(var(--accent) / 0.15), transparent 40%)`,
+        }}
+      />
+      <div className="z-10 flex w-full max-w-md flex-col items-center">
+        <Logo className="mb-8 h-auto w-48" />
+        <AuthForm />
+>>>>>>> fd9a66060fb5141d7bacd2d75f9d6bd0af4497b6
       </div>
     </div>
   );
