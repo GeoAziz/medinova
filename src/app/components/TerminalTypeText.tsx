@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 
 export default function TerminalTypeText({ text, className = '' }: { text: string; className?: string }) {
@@ -5,9 +7,12 @@ export default function TerminalTypeText({ text, className = '' }: { text: strin
   useEffect(() => {
     let i = 0;
     const interval = setInterval(() => {
+      if (i >= text.length) {
+        clearInterval(interval);
+        return;
+      }
       setDisplayed((prev) => prev + text[i]);
       i++;
-      if (i >= text.length) clearInterval(interval);
     }, 32);
     return () => clearInterval(interval);
   }, [text]);
