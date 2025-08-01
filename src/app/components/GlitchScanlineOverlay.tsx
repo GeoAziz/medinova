@@ -7,6 +7,15 @@ export default function GlitchScanlineOverlay() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    // Set canvas size to window size on mount and resize
+    function resize() {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
     const ctx = canvas.getContext('2d');
     let animationFrameId: number;
 
@@ -29,14 +38,15 @@ export default function GlitchScanlineOverlay() {
       animationFrameId = requestAnimationFrame(draw);
     }
     draw();
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', resize);
+    };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      width={window.innerWidth}
-      height={window.innerHeight}
       className="fixed inset-0 z-30 pointer-events-none mix-blend-screen"
       style={{ opacity: 0.18 }}
     />
