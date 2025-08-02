@@ -1,12 +1,11 @@
 "use client";
 import { Logo } from '@/components/icons/logo';
 import { AuthForm } from '@/components/auth/auth-form';
-import HologramClientWrapper from '@/components-client/HologramClientWrapper';
 
 export default function AuthPage() {
   return (
     <div className="relative grid min-h-screen grid-cols-1 overflow-hidden md:grid-cols-2">
-      {/* Left Pane: Visuals + 3D Hologram */}
+      {/* Left Pane: Visuals */}
       <div className="relative hidden items-center justify-center bg-secondary p-8 md:flex">
         <div
           className="absolute inset-0 z-0"
@@ -15,9 +14,6 @@ export default function AuthPage() {
                               radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.1), transparent 30%)`,
           }}
         />
-        <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
-          <HologramClientWrapper />
-        </div>
         <div className="z-20 text-center">
           <Logo className="h-auto w-80 mx-auto" />
           <h2 className="mt-4 text-2xl font-bold text-foreground">
