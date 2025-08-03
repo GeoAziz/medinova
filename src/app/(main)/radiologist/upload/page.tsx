@@ -17,7 +17,7 @@ export default function RadiologistUploadPage() {
         title="Upload Imaging Results"
         description="Add new scans to the system and assign them to patients."
       />
-      <div className="max-w-4xl mx-auto">
+      <div>
         <GlowingCard>
           <CardHeader>
             <CardTitle>New Scan Details</CardTitle>

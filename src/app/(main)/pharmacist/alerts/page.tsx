@@ -13,7 +13,7 @@ export default function PharmacistAlertsPage() {
         description="Review system-generated safety alerts."
         actions={<Button variant="outline">Acknowledge All</Button>}
       />
-      <div className="max-w-4xl space-y-6">
+      <div className="space-y-6">
         <GlowingCard>
           <CardHeader>
             <CardTitle>Critical Alerts</CardTitle>

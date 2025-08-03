@@ -12,7 +12,7 @@ export default function ReceptionSettingsPage() {
         title="Reception Settings"
         description="Manage your preferences and system configurations."
       />
-      <div className="max-w-2xl space-y-6">
+      <div className="space-y-6">
         <GlowingCard>
             <CardHeader>
                 <CardTitle>Notification Settings</CardTitle>

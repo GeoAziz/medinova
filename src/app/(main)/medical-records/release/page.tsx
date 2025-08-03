@@ -14,7 +14,7 @@ export default function MROReleasePage() {
         title="Secure Data Release"
         description="Prepare and release authenticated medical records to authorized entities."
       />
-      <div className="max-w-2xl mx-auto">
+      <div>
         <GlowingCard>
           <CardHeader>
             <CardTitle>Release Medical Records</CardTitle>
