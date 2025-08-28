@@ -30,6 +30,9 @@ import { Label } from '../ui/label';
 import { UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import type { Pharmacist } from '@/app/(main)/admin/pharmacists/page';
 import { addPharmacist, updatePharmacist, deletePharmacist } from '@/lib/actions/pharmacist.actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const shifts = ["Day Shift (8am-4pm)", "Evening Shift (4pm-12am)", "Night Shift (12am-8am)", "Rotating"];
 
 type PharmacistActionsProps = 
   | { mode: 'add'; }
@@ -102,19 +105,24 @@ export function PharmacistActions(props: PharmacistActionsProps) {
                     <Input id="name" name="name" defaultValue={defaultValues.name} required />
                 </div>
                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Email Address</Label>
                     <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
-                    { mode === 'add' && <p className="text-xs text-muted-foreground">Password will be sent to this email.</p> }
+                    { mode === 'add' && <p className="text-xs text-muted-foreground">An invite link will be generated.</p> }
                 </div>
             </div>
             <div className='grid grid-cols-2 gap-4'>
                 <div>
-                    <Label htmlFor="prescriptionLogs">Prescriptions Filled</Label>
-                    <Input id="prescriptionLogs" name="prescriptionLogs" type="number" defaultValue={defaultValues.prescriptionLogs} required />
+                    <Label htmlFor="licenseNumber">License Number</Label>
+                    <Input id="licenseNumber" name="licenseNumber" defaultValue={defaultValues.licenseNumber} required />
                 </div>
                 <div>
-                    <Label htmlFor="medicinesAvailable">Inventory Items</Label>
-                    <Input id="medicinesAvailable" name="medicinesAvailable" type="number" defaultValue={defaultValues.medicinesAvailable} required />
+                  <Label htmlFor="shift">Shift</Label>
+                  <Select name="shift" defaultValue={defaultValues.shift} required>
+                      <SelectTrigger id="shift"><SelectValue placeholder="Select shift..." /></SelectTrigger>
+                      <SelectContent>
+                          {shifts.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      </SelectContent>
+                  </Select>
                 </div>
             </div>
             <DialogFooter>

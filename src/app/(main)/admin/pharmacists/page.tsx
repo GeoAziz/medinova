@@ -11,6 +11,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { PharmacistActions } from '@/components/admin/pharmacist-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 async function getPharmacists(query: string) {
   try {
@@ -42,8 +43,8 @@ async function getPharmacists(query: string) {
         id: user.uid,
         name: user.fullName,
         email: user.email,
-        prescriptionLogs: pharmacistRecord.prescriptionLogs || 0,
-        medicinesAvailable: pharmacistRecord.medicinesAvailable || 0,
+        licenseNumber: pharmacistRecord.licenseNumber || 'N/A',
+        shift: pharmacistRecord.shift || 'Not Assigned',
         imageURL: user.profileImage || pharmacistRecord.imageURL,
         createdAt: user.createdAt?.toDate().toLocaleDateString() || 'N/A',
       };
@@ -107,8 +108,8 @@ export default async function AdminPharmacistsPage({ searchParams }: { searchPar
               <TableHeader>
                 <TableRow>
                   <TableHead>Pharmacist</TableHead>
-                  <TableHead>Prescriptions Filled</TableHead>
-                  <TableHead>Inventory Items</TableHead>
+                  <TableHead>License #</TableHead>
+                  <TableHead>Shift</TableHead>
                   <TableHead>Date Added</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -128,8 +129,10 @@ export default async function AdminPharmacistsPage({ searchParams }: { searchPar
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{item.prescriptionLogs}</TableCell>
-                    <TableCell>{item.medicinesAvailable}</TableCell>
+                    <TableCell>{item.licenseNumber}</TableCell>
+                    <TableCell>
+                        <Badge variant="secondary">{item.shift}</Badge>
+                    </TableCell>
                     <TableCell>{item.createdAt}</TableCell>
                     <TableCell className="text-right">
                       <PharmacistActions mode="edit" pharmacist={item} />

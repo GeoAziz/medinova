@@ -9,8 +9,8 @@ import admin from 'firebase-admin';
 const pharmacistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  prescriptionLogs: z.coerce.number().min(0, 'Must be a positive number'),
-  medicinesAvailable: z.coerce.number().min(0, 'Must be a positive number'),
+  licenseNumber: z.string().min(1, 'License number is required'),
+  shift: z.string().min(1, 'Shift is required'),
 });
 
 export async function addPharmacist(prevState: any, formData: FormData) {
@@ -47,7 +47,7 @@ export async function addPharmacist(prevState: any, formData: FormData) {
 
     await adminDb.collection('pharmacists').doc(uid).set({
       ...pharmacistData,
-      name, // Keep name here for simpler queries if needed
+      name,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -70,7 +70,7 @@ export async function addPharmacist(prevState: any, formData: FormData) {
 }
 
 export async function updatePharmacist(id: string, prevState: any, formData: FormData) {
-  const validatedFields = pharmacistSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = pharmacistSchema.omit({ email: true }).safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -79,7 +79,7 @@ export async function updatePharmacist(id: string, prevState: any, formData: For
       message: 'Missing Fields. Failed to Update Pharmacist.',
     };
   }
-  const { name, email, ...pharmacistData } = validatedFields.data;
+  const { name, ...pharmacistData } = validatedFields.data;
 
   try {
     await adminDb.collection('pharmacists').doc(id).update(pharmacistData);
