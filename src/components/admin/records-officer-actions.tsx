@@ -96,27 +96,27 @@ export function RecordsOfficerActions(props: RecordsOfficerActionsProps) {
             </DialogDescription>
           </DialogHeader>
           <form action={dispatch} className="space-y-4">
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input id="name" name="name" defaultValue={defaultValues.name} required />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
-                    { mode === 'add' && <p className="text-xs text-muted-foreground">Password will be sent to this email.</p> }
-                </div>
+             <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" name="name" defaultValue={defaultValues.name} required />
             </div>
-            <div className='grid grid-cols-2 gap-4'>
-                 <div>
-                    <Label htmlFor="recordAccessLogs">Access Logs Reviewed</Label>
-                    <Input id="recordAccessLogs" name="recordAccessLogs" type="number" defaultValue={defaultValues.recordAccessLogs} required />
-                </div>
-                 <div>
-                    <Label htmlFor="reportsGenerated">Reports Generated</Label>
-                    <Input id="reportsGenerated" name="reportsGenerated" type="number" defaultValue={defaultValues.reportsGenerated} required />
-                </div>
+            <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
+                { mode === 'add' && <p className="text-xs text-muted-foreground">An invite link will be generated for password setup.</p> }
             </div>
+             {mode === 'edit' && (
+                <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                        <Label htmlFor="recordAccessLogs">Access Logs Reviewed</Label>
+                        <Input id="recordAccessLogs" name="recordAccessLogs" type="number" defaultValue={defaultValues.recordAccessLogs} />
+                    </div>
+                    <div>
+                        <Label htmlFor="reportsGenerated">Reports Generated</Label>
+                        <Input id="reportsGenerated" name="reportsGenerated" type="number" defaultValue={defaultValues.reportsGenerated} />
+                    </div>
+                </div>
+            )}
             <DialogFooter>
               <Button type="submit">{mode === 'add' ? 'Add Officer' : 'Save Changes'}</Button>
             </DialogFooter>

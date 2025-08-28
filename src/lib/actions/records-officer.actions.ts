@@ -6,15 +6,18 @@ import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
-const recordsOfficerSchema = z.object({
+const addRecordsOfficerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  recordAccessLogs: z.coerce.number().min(0, 'Must be a positive number'),
-  reportsGenerated: z.coerce.number().min(0, 'Must be a positive number'),
 });
 
+const updateRecordsOfficerSchema = addRecordsOfficerSchema.extend({
+  recordAccessLogs: z.coerce.number().min(0, 'Must be a positive number').optional(),
+  reportsGenerated: z.coerce.number().min(0, 'Must be a positive number').optional(),
+}).omit({email: true});
+
 export async function addRecordsOfficer(prevState: any, formData: FormData) {
-  const validatedFields = recordsOfficerSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = addRecordsOfficerSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -28,7 +31,7 @@ export async function addRecordsOfficer(prevState: any, formData: FormData) {
     return { type: 'error', message: 'Authentication service not available.'};
   }
 
-  const { name, email, ...officerData } = validatedFields.data;
+  const { name, email } = validatedFields.data;
 
   try {
     const userRecord = await adminAuth.createUser({ email, displayName: name });
@@ -46,8 +49,9 @@ export async function addRecordsOfficer(prevState: any, formData: FormData) {
     });
 
     await adminDb.collection('medicalRecordsOfficers').doc(uid).set({
-      ...officerData,
       name,
+      recordAccessLogs: 0,
+      reportsGenerated: 0,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -70,7 +74,7 @@ export async function addRecordsOfficer(prevState: any, formData: FormData) {
 }
 
 export async function updateRecordsOfficer(id: string, prevState: any, formData: FormData) {
-  const validatedFields = recordsOfficerSchema.omit({email: true}).safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = updateRecordsOfficerSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
