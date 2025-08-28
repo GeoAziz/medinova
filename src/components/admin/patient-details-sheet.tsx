@@ -10,38 +10,15 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, Stethoscope, User, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
+import { FileText, Calendar, Stethoscope, User, AlertTriangle, ShieldCheck } from 'lucide-react';
 import type { Patient } from '@/app/(main)/admin/patients/page';
 import type { Doctor } from '@/app/(main)/admin/doctors/page';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { adminDb } from '@/lib/firebase-admin';
 import { useEffect, useState, useCallback } from 'react';
-
-type PatientEvent = {
-    id: string;
-    timestamp: any; 
-    eventType: string;
-    description: string;
-    actorId: string;
-}
-
-// NOTE: This component uses the Firebase Admin SDK on the client side for prototyping convenience.
-// In a production environment, this data fetching MUST be moved to a secure API route (a server action)
-// that enforces security rules to ensure an admin is authorized to view this data.
-async function getPatientEvents(patientId: string): Promise<PatientEvent[]> {
-    if (!adminDb) {
-        console.error("Firestore not available");
-        return [];
-    }
-    const snapshot = await adminDb.collection('patients').doc(patientId).collection('patient_events').orderBy('timestamp', 'desc').get();
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-    })) as PatientEvent[];
-}
+import { getPatientEvents, type PatientEvent } from '@/lib/actions/timeline.actions';
 
 
 export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, doctors: Doctor[] }) {
@@ -135,15 +112,15 @@ export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, do
                                 <p>Loading timeline...</p>
                             ) : timeline.length > 0 ? (
                                 <ul className="space-y-4">
-                                    {timeline.map(item => (
+                                    {timeline.map((item, index) => (
                                     <li key={item.id} className="flex gap-4">
                                         <div className="flex flex-col items-center">
                                             <div className="w-4 h-4 rounded-full bg-primary mt-1"></div>
-                                            { item.id !== timeline[timeline.length - 1].id && <div className="flex-1 w-px bg-border"></div> }
+                                            { index < timeline.length - 1 && <div className="flex-1 w-px bg-border"></div> }
                                         </div>
                                         <div>
                                             <p className="font-semibold">{item.description}</p>
-                                            <p className="text-xs text-muted-foreground">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</p>
+                                            <p className="text-xs text-muted-foreground">{item.timestamp}</p>
                                         </div>
                                     </li>
                                     ))}
