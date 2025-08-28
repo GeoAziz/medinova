@@ -30,6 +30,10 @@ import { Label } from '../ui/label';
 import { UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import type { LabScientist } from '@/app/(main)/admin/lab-scientists/page';
 import { addLabScientist, updateLabScientist, deleteLabScientist } from '@/lib/actions/lab-scientist.actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const labTypes = ["Hematology", "Microbiology", "Clinical Chemistry", "Genetics", "Toxicology", "Immunology"];
+
 
 type LabScientistActionsProps = 
   | { mode: 'add'; }
@@ -96,22 +100,33 @@ export function LabScientistActions(props: LabScientistActionsProps) {
             </DialogDescription>
           </DialogHeader>
           <form action={dispatch} className="space-y-4">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" name="name" defaultValue={defaultValues.name} required />
-            </div>
-             <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input id="name" name="name" defaultValue={defaultValues.name} required />
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
+                </div>
             </div>
             <div>
               <Label htmlFor="labType">Lab Type</Label>
-              <Input id="labType" name="labType" defaultValue={defaultValues.labType} required />
+              <Select name="labType" defaultValue={defaultValues.labType} required>
+                    <SelectTrigger id="labType">
+                        <SelectValue placeholder="Select lab type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {labTypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                </Select>
             </div>
-             <div>
-              <Label htmlFor="recentTests">Tests This Month</Label>
-              <Input id="recentTests" name="recentTests" type="number" defaultValue={defaultValues.recentTests} required />
-            </div>
+             {mode === 'edit' && (
+                <div>
+                    <Label htmlFor="recentTests">Tests This Month</Label>
+                    <Input id="recentTests" name="recentTests" type="number" defaultValue={defaultValues.recentTests} required />
+                </div>
+             )}
             <DialogFooter>
               <Button type="submit">{mode === 'add' ? 'Add Scientist' : 'Save Changes'}</Button>
             </DialogFooter>

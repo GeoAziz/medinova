@@ -6,15 +6,19 @@ import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
-const labScientistSchema = z.object({
+const addLabScientistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
   labType: z.string().min(1, 'Lab Type is required'),
-  recentTests: z.coerce.number().min(0, 'Must be a positive number'),
 });
 
+const updateLabScientistSchema = addLabScientistSchema.extend({
+  recentTests: z.coerce.number().min(0, 'Must be a positive number'),
+}).omit({email: true});
+
+
 export async function addLabScientist(prevState: any, formData: FormData) {
-  const validatedFields = labScientistSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = addLabScientistSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -28,7 +32,7 @@ export async function addLabScientist(prevState: any, formData: FormData) {
     return { type: 'error', message: 'Authentication service not available.'};
   }
 
-  const { name, email, labType, recentTests } = validatedFields.data;
+  const { name, email, labType } = validatedFields.data;
 
   try {
     const userRecord = await adminAuth.createUser({ email, displayName: name });
@@ -48,7 +52,7 @@ export async function addLabScientist(prevState: any, formData: FormData) {
     await adminDb.collection('labScientists').doc(uid).set({
       name: name,
       labType: labType,
-      recentTests: recentTests,
+      recentTests: 0,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -71,7 +75,7 @@ export async function addLabScientist(prevState: any, formData: FormData) {
 }
 
 export async function updateLabScientist(id: string, prevState: any, formData: FormData) {
-    const validatedFields = labScientistSchema.omit({email: true}).safeParse(Object.fromEntries(formData.entries()));
+    const validatedFields = updateLabScientistSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
