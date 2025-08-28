@@ -32,6 +32,10 @@ import type { Nurse } from '@/app/(main)/admin/nurses/page';
 import { addNurse, updateNurse, deleteNurse } from '@/lib/actions/nurse.actions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
+const wards = ["Cardiovascular Wing", "Neurology Unit", "Pediatric Ward", "General Medicine", "Surgical Ward", "Emergency Department"];
+const shifts = ["Day Shift (7am-7pm)", "Night Shift (7pm-7am)", "Rotating", "Mid-Shift (11am-11pm)"];
+const statuses = ["On Duty", "Off Duty", "On Leave"];
+
 type NurseActionsProps = 
   | { mode: 'add'; }
   | { mode: 'edit'; nurse: Nurse; };
@@ -109,11 +113,21 @@ export function NurseActions(props: NurseActionsProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="ward">Ward</Label>
-                <Input id="ward" name="ward" defaultValue={defaultValues.ward} required />
+                <Select name="ward" defaultValue={defaultValues.ward} required>
+                    <SelectTrigger id="ward"><SelectValue placeholder="Select ward..." /></SelectTrigger>
+                    <SelectContent>
+                        {wards.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
+                    </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="shift">Shift</Label>
-                <Input id="shift" name="shift" defaultValue={defaultValues.shift} required />
+                 <Select name="shift" defaultValue={defaultValues.shift} required>
+                    <SelectTrigger id="shift"><SelectValue placeholder="Select shift..." /></SelectTrigger>
+                    <SelectContent>
+                        {shifts.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                </Select>
               </div>
             </div>
              <div>
@@ -123,9 +137,7 @@ export function NurseActions(props: NurseActionsProps) {
                         <SelectValue placeholder="Select status..." />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="On Duty">On Duty</SelectItem>
-                        <SelectItem value="Off Duty">Off Duty</SelectItem>
-                        <SelectItem value="On Leave">On Leave</SelectItem>
+                        {statuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                 </Select>
             </div>
