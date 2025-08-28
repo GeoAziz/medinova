@@ -14,22 +14,26 @@ try {
     serviceAccount = require('../../serviceAccountKey.json');
   }
 } catch (error) {
-    console.error("Failed to parse Firebase service account JSON. Make sure the environment variable is set correctly.", error);
-    // You might want to throw an error here or handle it gracefully
+    // This catch block will handle errors from both parsing the env var and requiring the local file.
+    console.error("Failed to load Firebase service account credentials.", error);
+    serviceAccount = null; // Ensure serviceAccount is null if loading fails
 }
 
 
 if (!admin.apps.length) {
-  try {
-    if (serviceAccount) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-        });
-    } else {
-        console.warn("Firebase Admin SDK not initialized. Service account credentials are missing.");
+  if (serviceAccount) {
+    try {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } catch (error) {
+      console.error('Firebase admin initialization error', error);
     }
-  } catch (error) {
-    console.error('Firebase admin initialization error', error);
+  } else {
+    // This is the critical new part.
+    console.error('FIREBASE_SERVICE_ACCOUNT_JSON environment variable is not set and serviceAccountKey.json was not found.');
+    // In a real production scenario, you might want to throw an error to fail fast.
+    // For now, we'll log a very clear error.
   }
 }
 
@@ -38,8 +42,7 @@ const adminAuth = admin.apps.length ? admin.auth() : null;
 
 // It's good practice to check if the services are available before exporting
 if (!adminDb || !adminAuth) {
-    console.error("Firebase Admin SDK services (Firestore or Auth) are not available.");
-    // You can choose to export null or throw an error depending on your error handling strategy
+    console.error("Firebase Admin SDK services (Firestore or Auth) are not available. This is likely due to a missing or invalid service account configuration.");
 }
 
 export { adminDb, adminAuth };
