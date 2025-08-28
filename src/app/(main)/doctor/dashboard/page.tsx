@@ -9,6 +9,7 @@ import { AiAssistantModal } from '@/components/doctor/ai-assistant-modal';
 import { PrescriptionModal } from '@/components/doctor/prescription-modal';
 import Link from 'next/link';
 import { FlaskConical, Stethoscope, BrainCircuit } from 'lucide-react';
+import Image from 'next/image';
 
 export default function DoctorDashboard() {
   return (
@@ -43,7 +44,7 @@ export default function DoctorDashboard() {
                     <TableRow key={patient.id} className="cursor-pointer">
                       <TableCell>
                         <Avatar className="h-9 w-9">
-                          <AvatarImage src={`https://placehold.co/40x40.png`} data-ai-hint="person portrait" />
+                          <Image src={`https://picsum.photos/40/40`} width={40} height={40} data-ai-hint="person portrait" alt={patient.name} />
                           <AvatarFallback>{patient.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                       </TableCell>

@@ -126,11 +126,11 @@ export const mockRadiologist = {
 };
 
 export const mockScanRequests: ScanRequest[] = [
-    { id: 'SCAN-001', patientName: 'Alex Ryder', patientId: 'PID-001', scanType: 'CT Scan', requestingDoctor: 'Dr. Kenji Tanaka', status: 'Pending', requestDate: '2024-08-05', imageUrl: 'https://placehold.co/600x400.png' },
-    { id: 'SCAN-002', patientName: 'Jasmine Lee', patientId: 'PID-002', scanType: 'X-Ray', requestingDoctor: 'Dr. Ben Carter', status: 'Pending', requestDate: '2024-08-05', imageUrl: 'https://placehold.co/600x400.png' },
-    { id: 'SCAN-003', patientName: 'Marcus Thorne', patientId: 'PID-003', scanType: 'MRI', requestingDoctor: 'Dr. Kenji Tanaka', status: 'Reviewed', requestDate: '2024-08-04', imageUrl: 'https://placehold.co/600x400.png' },
-    { id: 'SCAN-004', patientName: 'Zara Al-Jamil', patientId: 'PID-004', scanType: 'X-Ray', requestingDoctor: 'Dr. Evelyn Reed', status: 'Reviewed', requestDate: '2024-08-04', imageUrl: 'https://placehold.co/600x400.png' },
-    { id: 'SCAN-005', patientName: 'Leo Carter', patientId: 'PID-008', scanType: 'Ultrasound', requestingDoctor: 'Dr. Anya Sharma', status: 'Needs Re-scan', requestDate: '2024-08-03', imageUrl: 'https://placehold.co/600x400.png' },
+    { id: 'SCAN-001', patientName: 'Alex Ryder', patientId: 'PID-001', scanType: 'CT Scan', requestingDoctor: 'Dr. Kenji Tanaka', status: 'Pending', requestDate: '2024-08-05', imageUrl: 'https://picsum.photos/600/400' },
+    { id: 'SCAN-002', patientName: 'Jasmine Lee', patientId: 'PID-002', scanType: 'X-Ray', requestingDoctor: 'Dr. Ben Carter', status: 'Pending', requestDate: '2024-08-05', imageUrl: 'https://picsum.photos/600/400' },
+    { id: 'SCAN-003', patientName: 'Marcus Thorne', patientId: 'PID-003', scanType: 'MRI', requestingDoctor: 'Dr. Kenji Tanaka', status: 'Reviewed', requestDate: '2024-08-04', imageUrl: 'https://picsum.photos/600/400' },
+    { id: 'SCAN-004', patientName: 'Zara Al-Jamil', patientId: 'PID-004', scanType: 'X-Ray', requestingDoctor: 'Dr. Evelyn Reed', status: 'Reviewed', requestDate: '2024-08-04', imageUrl: 'https://picsum.photos/600/400' },
+    { id: 'SCAN-005', patientName: 'Leo Carter', patientId: 'PID-008', scanType: 'Ultrasound', requestingDoctor: 'Dr. Anya Sharma', status: 'Needs Re-scan', requestDate: '2024-08-03', imageUrl: 'https://picsum.photos/600/400' },
 ];
 
 export const mockReceptionist = {
@@ -217,10 +217,10 @@ export const mockSystemLogs: SystemLog[] = [
 ];
 
 export const mockAvailableDoctors = [
-    { id: 'doc-01', name: 'Dr. Evelyn Reed', specialty: 'Cardiology', avatar: '/avatars/doctor-1.png' },
-    { id: 'doc-02', name: 'Dr. Kenji Tanaka', specialty: 'Neurology', avatar: '/avatars/doctor-3.png' },
-    { id: 'doc-03', name: 'Dr. Anya Sharma', specialty: 'Dermatology', avatar: '/avatars/doctor-3.png' },
-    { id: 'doc-04', name: 'Dr. Ben Carter', specialty: 'Orthopedics', avatar: '/avatars/doctor-4.png' },
+    { id: 'doc-01', name: 'Dr. Evelyn Reed', specialty: 'Cardiology', avatar: 'https://picsum.photos/80/80' },
+    { id: 'doc-02', name: 'Dr. Kenji Tanaka', specialty: 'Neurology', avatar: 'https://picsum.photos/80/80' },
+    { id: 'doc-03', name: 'Dr. Anya Sharma', specialty: 'Dermatology', avatar: 'https://picsum.photos/80/80' },
+    { id: 'doc-04', name: 'Dr. Ben Carter', specialty: 'Orthopedics', avatar: 'https://picsum.photos/80/80' },
 ];
 
 export const mockChatContacts = [

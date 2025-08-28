@@ -12,6 +12,7 @@ import { DoctorActions } from '@/components/admin/doctor-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 export async function getDoctors(query: string) {
   try {
@@ -134,7 +135,7 @@ export default async function AdminDoctorsPage({ searchParams }: { searchParams?
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={doctor.imageURL} alt={doctor.name} data-ai-hint="doctor portrait" />
+                          <Image src={doctor.imageURL} width={40} height={40} alt={doctor.name} data-ai-hint="doctor portrait" />
                           <AvatarFallback>{doctor.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div>

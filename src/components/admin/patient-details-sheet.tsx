@@ -19,6 +19,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { useEffect, useState, useCallback } from 'react';
 import { getPatientEvents, type PatientEvent } from '@/lib/actions/timeline.actions';
+import Image from 'next/image';
 
 
 export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, doctors: Doctor[] }) {
@@ -59,7 +60,7 @@ export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, do
                 <SheetHeader className="mb-6">
                     <div className="flex items-center gap-4">
                         <Avatar className="h-16 w-16">
-                            <AvatarImage src={`https://placehold.co/128x128.png`} alt={patient.name} data-ai-hint="person portrait" />
+                            <Image src={`https://picsum.photos/128/128`} width={128} height={128} alt={patient.name} data-ai-hint="person portrait" />
                             <AvatarFallback>{patient.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div>

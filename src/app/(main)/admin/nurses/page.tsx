@@ -12,6 +12,7 @@ import { NurseActions } from '@/components/admin/nurse-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 async function getNurses(query: string) {
   try {
@@ -122,7 +123,7 @@ export default async function AdminNursesPage({ searchParams }: { searchParams?:
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={nurse.imageURL} alt={nurse.name} data-ai-hint="nurse portrait" />
+                          <Image src={nurse.imageURL} width={40} height={40} alt={nurse.name} data-ai-hint="nurse portrait" />
                           <AvatarFallback>{nurse.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div>

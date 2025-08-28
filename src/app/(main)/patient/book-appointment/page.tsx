@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type Doctor = typeof mockAvailableDoctors[0];
 
@@ -66,7 +67,7 @@ export default function BookAppointmentPage() {
                 <Card key={doctor.id} className="cursor-pointer hover:border-primary transition-all" onClick={() => handleSelectDoctor(doctor)}>
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <Avatar className="w-20 h-20 mb-4">
-                      <AvatarImage src={`https://placehold.co/80x80.png`} data-ai-hint="doctor portrait" />
+                      <Image src={`https://picsum.photos/80/80`} width={80} height={80} data-ai-hint="doctor portrait" alt={doctor.name} />
                       <AvatarFallback>{doctor.name.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <p className="font-semibold">{doctor.name}</p>

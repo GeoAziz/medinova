@@ -11,6 +11,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { LabScientistActions } from '@/components/admin/lab-scientist-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
+import Image from 'next/image';
 
 async function getLabScientists(query: string) {
   try {
@@ -120,7 +121,7 @@ export default async function AdminLabScientistsPage({ searchParams }: { searchP
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={item.imageURL} alt={item.name} data-ai-hint="scientist portrait" />
+                          <Image src={item.imageURL} width={40} height={40} alt={item.name} data-ai-hint="scientist portrait" />
                           <AvatarFallback>{item.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div>

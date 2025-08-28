@@ -16,9 +16,9 @@ import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const mockRadiologyReports = [
-  { id: 'xray-01', title: 'Chest X-Ray', date: '2024-06-28', image: 'https://placehold.co/600x400.png', hint: 'x-ray' },
-  { id: 'mri-01', title: 'Brain MRI', date: '2024-07-15', image: 'https://placehold.co/600x400.png', hint: 'brain scan' },
-  { id: 'ct-01', title: 'Abdominal CT', date: '2024-07-20', image: 'https://placehold.co/600x400.png', hint: 'ct scan' },
+  { id: 'xray-01', title: 'Chest X-Ray', date: '2024-06-28', image: 'https://picsum.photos/600/400', hint: 'x-ray' },
+  { id: 'mri-01', title: 'Brain MRI', date: '2024-07-15', image: 'https://picsum.photos/600/400', hint: 'brain scan' },
+  { id: 'ct-01', title: 'Abdominal CT', date: '2024-07-20', image: 'https://picsum.photos/600/400', hint: 'ct scan' },
 ];
 
 export default function DoctorDiagnosticsPage() {
@@ -113,7 +113,7 @@ export default function DoctorDiagnosticsPage() {
                         <CarouselItem key={report.id} className="md:basis-1/2 lg:basis-1/3">
                             <Card>
                                 <CardContent className="p-0">
-                                    <Image src={report.image} data-ai-hint={report.hint} alt={report.title} width={400} height={250} className="rounded-t-lg aspect-video object-cover" />
+                                    <Image src={report.image} data-ai-hint={report.hint} alt={report.title} width={600} height={400} className="rounded-t-lg aspect-video object-cover" />
                                     <div className="p-4">
                                         <p className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" /> {report.title}</p>
                                         <p className="text-sm text-muted-foreground">{report.date}</p>
@@ -138,7 +138,7 @@ export default function DoctorDiagnosticsPage() {
             </CardHeader>
             <CardContent>
               <div className="aspect-square bg-secondary rounded-lg flex items-center justify-center p-4">
-                 <Image src="https://placehold.co/400x400.png" alt="3D Body Model Placeholder" width={400} height={400} className="object-cover rounded-md" data-ai-hint="human anatomy" />
+                 <Image src="https://picsum.photos/400/400" alt="3D Body Model Placeholder" width={400} height={400} className="object-cover rounded-md" data-ai-hint="human anatomy" />
               </div>
                <div className="flex justify-center gap-2 mt-4">
                 <Button variant="outline" size="sm" disabled>Skin</Button>

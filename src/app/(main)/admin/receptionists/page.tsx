@@ -12,6 +12,7 @@ import { ReceptionistActions } from '@/components/admin/receptionist-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 async function getReceptionists(query: string) {
   try {
@@ -119,7 +120,7 @@ export default async function AdminReceptionistsPage({ searchParams }: { searchP
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={item.imageURL} alt={item.name} data-ai-hint="person portrait" />
+                          <Image src={item.imageURL} width={40} height={40} alt={item.name} data-ai-hint="person portrait" />
                           <AvatarFallback>{item.name.substring(0, 2)}</AvatarFallback>
                         </Avatar>
                         <div>

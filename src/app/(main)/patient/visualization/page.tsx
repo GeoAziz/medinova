@@ -7,12 +7,13 @@ import Image from 'next/image';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Heart, Thermometer, Activity, Bot } from 'lucide-react';
+import HologramClientWrapper from '@/components-client/HologramClientWrapper';
 
 const mockReports = [
-  { id: 'mri-01', title: 'Brain MRI', date: '2024-07-15', image: 'https://placehold.co/600x400.png', hint: 'brain scan' },
-  { id: 'lab-01', title: 'Blood Work', date: '2024-07-12', image: 'https://placehold.co/600x400.png', hint: 'lab results' },
-  { id: 'xray-01', title: 'Chest X-Ray', date: '2024-06-28', image: 'https://placehold.co/600x400.png', hint: 'x-ray' },
-  { id: 'ecg-01', title: 'ECG Analysis', date: '2024-05-20', image: 'https://placehold.co/600x400.png', hint: 'heart ecg' },
+  { id: 'mri-01', title: 'Brain MRI', date: '2024-07-15', image: 'https://picsum.photos/400/250', hint: 'brain scan' },
+  { id: 'lab-01', title: 'Blood Work', date: '2024-07-12', image: 'https://picsum.photos/400/250', hint: 'lab results' },
+  { id: 'xray-01', title: 'Chest X-Ray', date: '2024-06-28', image: 'https://picsum.photos/400/250', hint: 'x-ray' },
+  { id: 'ecg-01', title: 'ECG Analysis', date: '2024-05-20', image: 'https://picsum.photos/400/250', hint: 'heart ecg' },
 ];
 
 export default function VisualizationPage() {
@@ -33,7 +34,7 @@ export default function VisualizationPage() {
             </CardHeader>
             <CardContent>
               <div className="aspect-video bg-secondary rounded-lg flex items-center justify-center p-4">
-                 <Image src="https://placehold.co/600x400.png" alt="3D Body Model" width={600} height={400} className="object-cover rounded-md" data-ai-hint="human anatomy" />
+                <HologramClientWrapper />
               </div>
               <div className="flex justify-center gap-2 mt-4">
                 <Button variant="outline">Skin</Button>
@@ -108,7 +109,7 @@ export default function VisualizationPage() {
                         <CarouselItem key={report.id} className="md:basis-1/2 lg:basis-1/3">
                             <Card>
                                 <CardContent className="p-0">
-                                    <Image src={report.image} data-ai-hint={report.hint} alt={report.title} width={400} height={250} className="rounded-t-lg aspect-video object-cover" />
+                                    <Image src={report.image} width={400} height={250} data-ai-hint={report.hint} alt={report.title} className="rounded-t-lg aspect-video object-cover" />
                                     <div className="p-4">
                                         <p className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" /> {report.title}</p>
                                         <p className="text-sm text-muted-foreground">{report.date}</p>

@@ -58,6 +58,7 @@ import {
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
 
 type NavItem = {
   href: string;
@@ -274,7 +275,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   </Popover>
                   <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
-                      <AvatarImage src={`https://placehold.co/40x40.png`} alt={userName} data-ai-hint="profile" />
+                      <Image src={`https://picsum.photos/40/40`} width={40} height={40} alt={userName} data-ai-hint="profile" />
                       <AvatarFallback>{userInitial}</AvatarFallback>
                     </Avatar>
                     <div className="hidden flex-col text-right md:flex">

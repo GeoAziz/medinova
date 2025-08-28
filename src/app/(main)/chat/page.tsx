@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { SendHorizonal, Search } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
 
 export default function ChatPage() {
   const activeChatPartner = mockChatContacts[0];
@@ -37,7 +38,7 @@ export default function ChatPage() {
                       contact.id === activeChatPartner.id && "bg-secondary"
                     )}>
                       <Avatar>
-                        <AvatarImage src={`https://placehold.co/40x40.png`} data-ai-hint="person portrait" />
+                        <Image src={`https://picsum.photos/40/40`} width={40} height={40} data-ai-hint="person portrait" alt={contact.name} />
                         <AvatarFallback>{contact.name.substring(0, 2)}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1 overflow-hidden">
@@ -55,7 +56,7 @@ export default function ChatPage() {
             <div className="md:col-span-2 lg:col-span-3 h-full flex flex-col">
               <div className="flex items-center gap-4 p-4 border-b border-border">
                 <Avatar>
-                  <AvatarImage src={`https://placehold.co/40x40.png`} data-ai-hint="doctor portrait"/>
+                  <Image src={`https://picsum.photos/40/40`} width={40} height={40} data-ai-hint="doctor portrait" alt={activeChatPartner.name}/>
                   <AvatarFallback>{activeChatPartner.name.substring(0,2)}</AvatarFallback>
                 </Avatar>
                 <div>
@@ -76,7 +77,7 @@ export default function ChatPage() {
                     <div key={msg.id} className={cn("flex items-end gap-2", msg.sender === 'me' ? 'justify-end' : 'justify-start')}>
                       {msg.sender === 'other' && (
                         <Avatar className="h-8 w-8">
-                           <AvatarImage src={`https://placehold.co/32x32.png`} data-ai-hint="doctor portrait" />
+                           <Image src={`https://picsum.photos/32/32`} width={32} height={32} data-ai-hint="doctor portrait" alt={activeChatPartner.name}/>
                            <AvatarFallback>{activeChatPartner.name.substring(0,2)}</AvatarFallback>
                         </Avatar>
                       )}
