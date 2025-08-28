@@ -27,7 +27,7 @@ import {
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { UserPlus, Edit, Trash2 } from 'lucide-react';
+import { UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import type { Radiologist } from '@/app/(main)/admin/radiologists/page';
 import { addRadiologist, updateRadiologist, deleteRadiologist } from '@/lib/actions/radiologist.actions';
 
@@ -38,20 +38,26 @@ type RadiologistActionsProps =
 export function RadiologistActions(props: RadiologistActionsProps) {
   const { mode } = props;
   const [isOpen, setIsOpen] = useState(false);
+  const [showLink, setShowLink] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState<string | null | undefined>(null);
   const { toast } = useToast();
 
-  const initialState = { message: null, errors: {}, type: '' };
+  const initialState: { message: string | null, errors?: any, type: string, link?: string | null } = { message: null, type: '' };
   const action = mode === 'add' ? addRadiologist : updateRadiologist.bind(null, props.mode === 'edit' ? props.radiologist.id : '');
   const [state, dispatch] = useActionState(action, initialState);
 
   useEffect(() => {
-    if (state.type === 'success') {
-      toast({ title: 'Success!', description: state.message });
+    if (state.type === 'success' && mode === 'add') {
+      setGeneratedLink(state.link);
+      setShowLink(true);
       setIsOpen(false);
+    } else if (state.type === 'success') {
+       toast({ title: 'Success!', description: state.message });
+       setIsOpen(false);
     } else if (state.type === 'error') {
       toast({ variant: 'destructive', title: 'Error', description: state.message });
     }
-  }, [state, toast]);
+  }, [state, toast, mode]);
 
    const handleDelete = async () => {
     if (props.mode !== 'edit') return;
@@ -62,6 +68,13 @@ export function RadiologistActions(props: RadiologistActionsProps) {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
     }
   };
+
+  const copyToClipboard = () => {
+    if (generatedLink) {
+        navigator.clipboard.writeText(generatedLink);
+        toast({ title: 'Copied to clipboard!' });
+    }
+  }
 
   const defaultValues = mode === 'edit' ? props.radiologist : {} as Radiologist;
 
@@ -85,15 +98,19 @@ export function RadiologistActions(props: RadiologistActionsProps) {
           <form action={dispatch} className="space-y-4">
             <div>
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" name="name" defaultValue={defaultValues.name} />
+              <Input id="name" name="name" defaultValue={defaultValues.name} required/>
+            </div>
+             <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode==='edit'} />
             </div>
              <div>
               <Label htmlFor="imagingTypes">Primary Imaging Type</Label>
-              <Input id="imagingTypes" name="imagingTypes" defaultValue={defaultValues.imagingTypes} />
+              <Input id="imagingTypes" name="imagingTypes" defaultValue={defaultValues.imagingTypes} required />
             </div>
             <div>
               <Label htmlFor="scanReports">Reports This Month</Label>
-              <Input id="scanReports" name="scanReports" type="number" defaultValue={defaultValues.scanReports} />
+              <Input id="scanReports" name="scanReports" type="number" defaultValue={defaultValues.scanReports} required />
             </div>
             <DialogFooter>
               <Button type="submit">{mode === 'add' ? 'Add Radiologist' : 'Save Changes'}</Button>
@@ -102,6 +119,26 @@ export function RadiologistActions(props: RadiologistActionsProps) {
         </DialogContent>
       </Dialog>
       
+       <AlertDialog open={showLink} onOpenChange={setShowLink}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Radiologist Created Successfully!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please share this secure link with the new radiologist to allow them to set their password. This link will only be shown once.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="relative">
+            <Input readOnly value={generatedLink || ''} className="pr-10"/>
+            <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={copyToClipboard}>
+                <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowLink(false)}>Done</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {mode === 'edit' && (
         <AlertDialog>
           <AlertDialogTrigger asChild>

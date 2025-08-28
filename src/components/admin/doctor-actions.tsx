@@ -27,7 +27,7 @@ import {
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { UserPlus, Edit, Trash2, Users } from 'lucide-react';
+import { UserPlus, Edit, Trash2, Users, Copy } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import type { Doctor } from '@/app/(main)/admin/doctors/page';
 import { addDoctor, updateDoctor, deleteDoctor } from '@/lib/actions/doctor.actions';
@@ -39,20 +39,27 @@ type DoctorActionsProps =
 export function DoctorActions(props: DoctorActionsProps) {
   const { mode } = props;
   const [isOpen, setIsOpen] = useState(false);
+  const [showLink, setShowLink] = useState(false);
+  const [generatedLink, setGeneratedLink] = useState<string | null | undefined>(null);
+
   const { toast } = useToast();
 
-  const initialState = { message: null, errors: {}, type: '' };
+  const initialState: { message: string | null, errors?: any, type: string, link?: string | null } = { message: null, type: '' };
   const action = mode === 'add' ? addDoctor : updateDoctor.bind(null, props.mode === 'edit' ? props.doctor.id : '');
   const [state, dispatch] = useActionState(action, initialState);
 
   useEffect(() => {
-    if (state.type === 'success') {
-      toast({ title: 'Success!', description: state.message });
+    if (state.type === 'success' && mode === 'add') {
+      setGeneratedLink(state.link);
+      setShowLink(true);
       setIsOpen(false);
+    } else if (state.type === 'success') {
+       toast({ title: 'Success!', description: state.message });
+       setIsOpen(false);
     } else if (state.type === 'error') {
       toast({ variant: 'destructive', title: 'Error', description: state.message });
     }
-  }, [state, toast]);
+  }, [state, toast, mode]);
 
    const handleDelete = async () => {
     if (props.mode !== 'edit') return;
@@ -63,6 +70,13 @@ export function DoctorActions(props: DoctorActionsProps) {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
     }
   };
+
+  const copyToClipboard = () => {
+    if (generatedLink) {
+        navigator.clipboard.writeText(generatedLink);
+        toast({ title: 'Copied to clipboard!' });
+    }
+  }
 
   const defaultValues = mode === 'edit' ? props.doctor : {} as Doctor;
 
@@ -87,20 +101,20 @@ export function DoctorActions(props: DoctorActionsProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" name="name" defaultValue={defaultValues.name} />
+                <Input id="name" name="name" defaultValue={defaultValues.name} required />
               </div>
                <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" defaultValue={defaultValues.email} readOnly={mode === 'edit'} />
+                <Input id="email" name="email" type="email" defaultValue={defaultValues.email} required readOnly={mode === 'edit'} />
                  { mode === 'add' && <p className="text-xs text-muted-foreground">The user will be invited via this email.</p> }
               </div>
               <div className="space-y-2">
                 <Label htmlFor="specialty">Specialty</Label>
-                <Input id="specialty" name="specialty" defaultValue={defaultValues.specialty} />
+                <Input id="specialty" name="specialty" defaultValue={defaultValues.specialty} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
-                <Input id="department" name="department" defaultValue={defaultValues.department} />
+                <Input id="department" name="department" defaultValue={defaultValues.department} required />
               </div>
                <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="schedule">Schedule</Label>
@@ -118,6 +132,26 @@ export function DoctorActions(props: DoctorActionsProps) {
         </DialogContent>
       </Dialog>
       
+       <AlertDialog open={showLink} onOpenChange={setShowLink}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Doctor Created Successfully!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please share this secure link with the new doctor to allow them to set their password. This link will only be shown once.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="relative">
+            <Input readOnly value={generatedLink || ''} className="pr-10"/>
+            <Button size="icon" variant="ghost" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" onClick={copyToClipboard}>
+                <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowLink(false)}>Done</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {mode === 'edit' && (
         <>
           <Button size="icon" variant="outline" disabled>

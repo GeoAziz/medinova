@@ -2,22 +2,19 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { adminDb } from '../firebase-admin';
+import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
 const labScientistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
   labType: z.string().min(1, 'Lab Type is required'),
   recentTests: z.coerce.number().min(0, 'Must be a positive number'),
 });
 
 export async function addLabScientist(prevState: any, formData: FormData) {
-  const validatedFields = labScientistSchema.safeParse({
-    name: formData.get('name'),
-    labType: formData.get('labType'),
-    recentTests: formData.get('recentTests'),
-  });
+  const validatedFields = labScientistSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -27,42 +24,54 @@ export async function addLabScientist(prevState: any, formData: FormData) {
     };
   }
 
-  try {
-    // In a real app, you would have a more secure way to handle user creation and password setting.
-    const userRef = adminDb.collection('users').doc(); 
-    const uid = userRef.id;
+  if (!adminAuth) {
+    return { type: 'error', message: 'Authentication service not available.'};
+  }
 
-    await userRef.set({
+  const { name, email, labType, recentTests } = validatedFields.data;
+
+  try {
+    const userRecord = await adminAuth.createUser({ email, displayName: name });
+    const uid = userRecord.uid;
+
+    await adminAuth.setCustomUserClaims(uid, { role: 'lab_scientist' });
+
+    await adminDb.collection('users').doc(uid).set({
       uid,
-      fullName: validatedFields.data.name,
-      email: `scientist.${uid.substring(0,5)}@zizoverse.io`, // Placeholder email
+      fullName: name,
+      email,
       role: 'lab_scientist',
       profileImage: 'https://placehold.co/128x128.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     await adminDb.collection('labScientists').doc(uid).set({
-      name: validatedFields.data.name,
-      labType: validatedFields.data.labType,
-      recentTests: validatedFields.data.recentTests,
+      name: name,
+      labType: labType,
+      recentTests: recentTests,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    const link = await adminAuth.generatePasswordResetLink(email);
+
     revalidatePath('/admin/lab-scientists');
-    return { type: 'success', message: `Added scientist ${validatedFields.data.name}` };
-  } catch (error) {
+    return { 
+        type: 'success', 
+        message: `Scientist ${name} created. Share this link for password setup:`,
+        link: link,
+    };
+  } catch (error: any) {
     console.error(error);
+    if (error.code === 'auth/email-already-exists') {
+        return { type: 'error', message: 'This email is already registered.' };
+    }
     return { type: 'error', message: 'Database Error: Failed to Create Lab Scientist.' };
   }
 }
 
 export async function updateLabScientist(id: string, prevState: any, formData: FormData) {
-  const validatedFields = labScientistSchema.safeParse({
-    name: formData.get('name'),
-    labType: formData.get('labType'),
-    recentTests: formData.get('recentTests'),
-  });
+    const validatedFields = labScientistSchema.omit({email: true}).safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -76,7 +85,6 @@ export async function updateLabScientist(id: string, prevState: any, formData: F
   try {
     await adminDb.collection('labScientists').doc(id).update(scientistData);
     
-    // Also update the fullName in the corresponding /users document
     const userRef = adminDb.collection('users').doc(id);
     await userRef.update({ fullName: name });
 
@@ -89,9 +97,13 @@ export async function updateLabScientist(id: string, prevState: any, formData: F
 }
 
 export async function deleteLabScientist(id: string) {
+    if (!adminAuth) {
+      return { type: 'error', message: 'Authentication service not available.'};
+    }
     try {
         await adminDb.collection('labScientists').doc(id).delete();
         await adminDb.collection('users').doc(id).delete();
+        await adminAuth.deleteUser(id);
         revalidatePath('/admin/lab-scientists');
         return { type: 'success', message: 'Lab scientist deleted successfully.' };
     } catch (e) {

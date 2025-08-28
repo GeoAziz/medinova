@@ -2,7 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { adminDb } from '../firebase-admin';
+import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
@@ -30,13 +30,23 @@ export async function addDoctor(prevState: any, formData: FormData) {
 
   const { name, email, specialty, department, bio, schedule } = validatedFields.data;
 
-  try {
-    // This is a simplified approach. In a real app, you would create the user in Auth first.
-    const userRef = adminDb.collection('users').doc();
-    const uid = userRef.id;
+  if (!adminAuth) {
+    return { type: 'error', message: 'Authentication service not available.'};
+  }
 
-    // 1. Create the record in the /users collection
-    await userRef.set({
+  try {
+    // 1. Create the user in Firebase Auth
+    const userRecord = await adminAuth.createUser({
+      email,
+      displayName: name,
+    });
+    const uid = userRecord.uid;
+
+    // 2. Set the custom role claim
+    await adminAuth.setCustomUserClaims(uid, { role: 'doctor' });
+
+    // 3. Create the user record in /users collection
+    await adminDb.collection('users').doc(uid).set({
       uid,
       fullName: name,
       email,
@@ -45,7 +55,7 @@ export async function addDoctor(prevState: any, formData: FormData) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    // 2. Create the record in the /doctors collection using the same UID
+    // 4. Create the doctor profile in /doctors collection
     await adminDb.collection('doctors').doc(uid).set({
       name,
       specialty,
@@ -57,10 +67,20 @@ export async function addDoctor(prevState: any, formData: FormData) {
       status: 'Active', // Default status
     });
 
+    // 5. Generate password reset link
+    const link = await adminAuth.generatePasswordResetLink(email);
+
     revalidatePath('/admin/doctors');
-    return { type: 'success', message: `Added doctor profile for ${name}` };
-  } catch (error) {
+    return { 
+        type: 'success', 
+        message: `Doctor ${name} created. Share this link for password setup:`,
+        link: link,
+    };
+  } catch (error: any) {
     console.error("Error adding doctor:", error);
+    if (error.code === 'auth/email-already-exists') {
+        return { type: 'error', message: 'This email is already registered.' };
+    }
     return { type: 'error', message: 'Database Error: Failed to Create Doctor Profile.' };
   }
 }
@@ -100,9 +120,13 @@ export async function updateDoctor(id: string, prevState: any, formData: FormDat
 }
 
 export async function deleteDoctor(id: string) {
+    if (!adminAuth) {
+      return { type: 'error', message: 'Authentication service not available.'};
+    }
     try {
         await adminDb.collection('doctors').doc(id).delete();
         await adminDb.collection('users').doc(id).delete();
+        await adminAuth.deleteUser(id);
         
         revalidatePath('/admin/doctors');
         return { type: 'success', message: 'Doctor profile deleted successfully.' };

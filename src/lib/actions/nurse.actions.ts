@@ -2,7 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { adminDb } from '../firebase-admin';
+import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
@@ -25,13 +25,19 @@ export async function addNurse(prevState: any, formData: FormData) {
     };
   }
   
+  if (!adminAuth) {
+    return { type: 'error', message: 'Authentication service not available.'};
+  }
+
   const { name, email, ...nurseData } = validatedFields.data;
 
   try {
-    const userRef = adminDb.collection('users').doc();
-    const uid = userRef.id;
+    const userRecord = await adminAuth.createUser({ email, displayName: name });
+    const uid = userRecord.uid;
 
-    await userRef.set({
+    await adminAuth.setCustomUserClaims(uid, { role: 'nurse' });
+
+    await adminDb.collection('users').doc(uid).set({
       uid,
       fullName: name,
       email,
@@ -47,10 +53,19 @@ export async function addNurse(prevState: any, formData: FormData) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    const link = await adminAuth.generatePasswordResetLink(email);
+
     revalidatePath('/admin/nurses');
-    return { type: 'success', message: `Added nurse ${name}` };
-  } catch (error) {
-    console.error(error)
+    return { 
+        type: 'success', 
+        message: `Nurse ${name} created. Share this link for password setup:`,
+        link: link,
+    };
+  } catch (error: any) {
+    console.error(error);
+    if (error.code === 'auth/email-already-exists') {
+        return { type: 'error', message: 'This email is already registered.' };
+    }
     return { type: 'error', message: 'Database Error: Failed to Create Nurse.' };
   }
 }
@@ -82,9 +97,14 @@ export async function updateNurse(id: string, prevState: any, formData: FormData
 }
 
 export async function deleteNurse(id: string) {
+    if (!adminAuth) {
+      return { type: 'error', message: 'Authentication service not available.'};
+    }
     try {
         await adminDb.collection('nurses').doc(id).delete();
         await adminDb.collection('users').doc(id).delete();
+        await adminAuth.deleteUser(id);
+
         revalidatePath('/admin/nurses');
         return { type: 'success', message: 'Nurse profile deleted successfully.' };
     } catch (e) {

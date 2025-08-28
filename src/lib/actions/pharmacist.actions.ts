@@ -2,7 +2,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { adminDb } from '../firebase-admin';
+import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
@@ -24,19 +24,19 @@ export async function addPharmacist(prevState: any, formData: FormData) {
     };
   }
 
+  if (!adminAuth) {
+    return { type: 'error', message: 'Authentication service not available.'};
+  }
+
   const { name, email, ...pharmacistData } = validatedFields.data;
 
   try {
-    // In a real app, you would have a more secure way to handle user creation and password setting.
-    // For this prototype, we assume an admin creates the user and a password email is sent separately.
-    // Here, we just create the user profile documents. We are not creating an Auth user.
-    // This would typically be a two-step process or a callable function.
-    
-    // For simplicity, we'll auto-generate a UID. In a real app, this would come from Firebase Auth.
-    const userRef = adminDb.collection('users').doc(); 
-    const uid = userRef.id;
+    const userRecord = await adminAuth.createUser({ email, displayName: name });
+    const uid = userRecord.uid;
 
-    await userRef.set({
+    await adminAuth.setCustomUserClaims(uid, { role: 'pharmacist' });
+
+    await adminDb.collection('users').doc(uid).set({
       uid,
       fullName: name,
       email,
@@ -52,12 +52,19 @@ export async function addPharmacist(prevState: any, formData: FormData) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    console.log("Created a user and pharmacist profile with ID: ", uid);
+    const link = await adminAuth.generatePasswordResetLink(email);
 
     revalidatePath('/admin/pharmacists');
-    return { type: 'success', message: `Added pharmacist ${name}` };
-  } catch (error) {
+    return { 
+        type: 'success', 
+        message: `Pharmacist ${name} created. Share this link for password setup:`,
+        link: link,
+    };
+  } catch (error: any) {
     console.error(error);
+    if (error.code === 'auth/email-already-exists') {
+        return { type: 'error', message: 'This email is already registered.' };
+    }
     return { type: 'error', message: 'Database Error: Failed to Create Pharmacist.' };
   }
 }
@@ -89,10 +96,13 @@ export async function updatePharmacist(id: string, prevState: any, formData: For
 }
 
 export async function deletePharmacist(id: string) {
+    if (!adminAuth) {
+      return { type: 'error', message: 'Authentication service not available.'};
+    }
     try {
         await adminDb.collection('pharmacists').doc(id).delete();
         await adminDb.collection('users').doc(id).delete();
-        // In a real app, you'd also delete the user from Firebase Auth
+        await adminAuth.deleteUser(id);
         revalidatePath('/admin/pharmacists');
         return { type: 'success', message: 'Pharmacist profile deleted successfully.' };
     } catch (e) {
