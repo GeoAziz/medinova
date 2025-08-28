@@ -9,8 +9,7 @@ import admin from 'firebase-admin';
 const receptionistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
-  appointmentsHandled: z.coerce.number().min(0, 'Must be a positive number'),
-  incomingCalls: z.coerce.number().min(0, 'Must be a positive number'),
+  deskAssignment: z.string().min(1, 'Desk Assignment is required'),
 });
 
 export async function addReceptionist(prevState: any, formData: FormData) {
@@ -48,6 +47,8 @@ export async function addReceptionist(prevState: any, formData: FormData) {
     await adminDb.collection('receptionists').doc(uid).set({
       ...receptionistData,
       name,
+      appointmentsHandled: 0,
+      incomingCalls: 0,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });

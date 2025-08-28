@@ -11,6 +11,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ReceptionistActions } from '@/components/admin/receptionist-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 async function getReceptionists(query: string) {
   try {
@@ -42,8 +43,7 @@ async function getReceptionists(query: string) {
         id: user.uid,
         name: user.fullName,
         email: user.email,
-        appointmentsHandled: receptionistRecord.appointmentsHandled,
-        incomingCalls: receptionistRecord.incomingCalls,
+        deskAssignment: receptionistRecord.deskAssignment,
         imageURL: receptionistRecord.imageURL,
         createdAt: user.createdAt?.toDate().toLocaleDateString() || 'N/A',
       };
@@ -108,8 +108,7 @@ export default async function AdminReceptionistsPage({ searchParams }: { searchP
               <TableHeader>
                 <TableRow>
                   <TableHead>Receptionist</TableHead>
-                  <TableHead>Appointments Handled</TableHead>
-                  <TableHead>Incoming Calls</TableHead>
+                  <TableHead>Desk Assignment</TableHead>
                   <TableHead>Date Added</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -129,8 +128,9 @@ export default async function AdminReceptionistsPage({ searchParams }: { searchP
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{item.appointmentsHandled}</TableCell>
-                    <TableCell>{item.incomingCalls}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{item.deskAssignment || 'N/A'}</Badge>
+                    </TableCell>
                     <TableCell>{item.createdAt}</TableCell>
                     <TableCell className="text-right">
                        <ReceptionistActions mode="edit" receptionist={item} />

@@ -30,6 +30,10 @@ import { Label } from '../ui/label';
 import { UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import type { Receptionist } from '@/app/(main)/admin/receptionists/page';
 import { addReceptionist, updateReceptionist, deleteReceptionist } from '@/lib/actions/receptionist.actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const deskAssignments = ["Main Lobby", "Emergency Wing Desk", "Cardiology Floor Desk", "Pediatrics Wing Desk", "Surgical Ward Desk"];
+
 
 type ReceptionistActionsProps = 
   | { mode: 'add'; }
@@ -107,15 +111,16 @@ export function ReceptionistActions(props: ReceptionistActionsProps) {
                     { mode === 'add' && <p className="text-xs text-muted-foreground">Password will be sent to this email.</p> }
                 </div>
             </div>
-            <div className='grid grid-cols-2 gap-4'>
-                <div>
-                    <Label htmlFor="appointmentsHandled">Appointments Handled</Label>
-                    <Input id="appointmentsHandled" name="appointmentsHandled" type="number" defaultValue={defaultValues.appointmentsHandled} required />
-                </div>
-                <div>
-                    <Label htmlFor="incomingCalls">Incoming Calls</Label>
-                    <Input id="incomingCalls" name="incomingCalls" type="number" defaultValue={defaultValues.incomingCalls} required />
-                </div>
+            <div>
+              <Label htmlFor="deskAssignment">Desk Assignment</Label>
+              <Select name="deskAssignment" defaultValue={defaultValues.deskAssignment} required>
+                  <SelectTrigger id="deskAssignment">
+                      <SelectValue placeholder="Select desk..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                      {deskAssignments.map(desk => <SelectItem key={desk} value={desk}>{desk}</SelectItem>)}
+                  </SelectContent>
+              </Select>
             </div>
             <DialogFooter>
               <Button type="submit">{mode === 'add' ? 'Add Receptionist' : 'Save Changes'}</Button>
