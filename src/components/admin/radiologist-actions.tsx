@@ -30,6 +30,9 @@ import { Label } from '../ui/label';
 import { UserPlus, Edit, Trash2, Copy } from 'lucide-react';
 import type { Radiologist } from '@/app/(main)/admin/radiologists/page';
 import { addRadiologist, updateRadiologist, deleteRadiologist } from '@/lib/actions/radiologist.actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const imagingTypes = ["MRI", "CT Scan", "X-Ray", "Ultrasound", "PET Scan"];
 
 type RadiologistActionsProps = 
   | { mode: 'add'; }
@@ -106,12 +109,21 @@ export function RadiologistActions(props: RadiologistActionsProps) {
             </div>
              <div>
               <Label htmlFor="imagingTypes">Primary Imaging Type</Label>
-              <Input id="imagingTypes" name="imagingTypes" defaultValue={defaultValues.imagingTypes} required />
+              <Select name="imagingTypes" defaultValue={defaultValues.imagingTypes} required>
+                    <SelectTrigger id="imagingTypes">
+                        <SelectValue placeholder="Select imaging type..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {imagingTypes.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                </Select>
             </div>
-            <div>
-              <Label htmlFor="scanReports">Reports This Month</Label>
-              <Input id="scanReports" name="scanReports" type="number" defaultValue={defaultValues.scanReports} required />
-            </div>
+            {mode === 'edit' && (
+                <div>
+                  <Label htmlFor="scanReports">Reports This Month</Label>
+                  <Input id="scanReports" name="scanReports" type="number" defaultValue={defaultValues.scanReports} required />
+                </div>
+            )}
             <DialogFooter>
               <Button type="submit">{mode === 'add' ? 'Add Radiologist' : 'Save Changes'}</Button>
             </DialogFooter>

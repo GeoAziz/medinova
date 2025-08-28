@@ -6,15 +6,19 @@ import { adminDb, adminAuth } from '../firebase-admin';
 import { z } from 'zod';
 import admin from 'firebase-admin';
 
-const radiologistSchema = z.object({
+const addRadiologistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
   imagingTypes: z.string().min(1, 'Imaging Type is required'),
-  scanReports: z.coerce.number().min(0, 'Must be a positive number'),
 });
 
+const updateRadiologistSchema = addRadiologistSchema.extend({
+    scanReports: z.coerce.number().min(0, 'Must be a positive number'),
+}).omit({email: true});
+
+
 export async function addRadiologist(prevState: any, formData: FormData) {
-  const validatedFields = radiologistSchema.safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = addRadiologistSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -28,7 +32,7 @@ export async function addRadiologist(prevState: any, formData: FormData) {
     return { type: 'error', message: 'Authentication service not available.'};
   }
 
-  const { name, email, ...radiologistData } = validatedFields.data;
+  const { name, email, imagingTypes } = validatedFields.data;
 
   try {
      const userRecord = await adminAuth.createUser({ email, displayName: name });
@@ -46,7 +50,9 @@ export async function addRadiologist(prevState: any, formData: FormData) {
     });
 
     await adminDb.collection('radiologists').doc(uid).set({
-      ...radiologistData,
+      name,
+      imagingTypes,
+      scanReports: 0,
       imageURL: 'https://placehold.co/200x200.png',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
@@ -69,7 +75,7 @@ export async function addRadiologist(prevState: any, formData: FormData) {
 }
 
 export async function updateRadiologist(id: string, prevState: any, formData: FormData) {
-  const validatedFields = radiologistSchema.omit({ email: true }).safeParse(Object.fromEntries(formData.entries()));
+  const validatedFields = updateRadiologistSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
