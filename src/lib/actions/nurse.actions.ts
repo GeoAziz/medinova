@@ -8,6 +8,7 @@ import admin from 'firebase-admin';
 
 const nurseSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
   ward: z.string().min(1, 'Ward is required'),
   shift: z.string().min(1, 'Shift is required'),
   status: z.string().min(1, 'Status is required'),
@@ -24,22 +25,27 @@ export async function addNurse(prevState: any, formData: FormData) {
     };
   }
   
-  const { name, ward, shift, status } = validatedFields.data;
+  const { name, email, ...nurseData } = validatedFields.data;
 
   try {
-    // In a real app, you would create the user in Auth first and use their UID
-    const docRef = await adminDb.collection('nurses').add({
-      name,
-      ward,
-      shift,
-      status,
-      imageURL: 'https://placehold.co/200x200.png',
+    const userRef = adminDb.collection('users').doc();
+    const uid = userRef.id;
+
+    await userRef.set({
+      uid,
+      fullName: name,
+      email,
+      role: 'nurse',
+      profileImage: `https://placehold.co/128x128.png`,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
     
-    // This is a simplified approach. A full implementation would link this to a user in /users.
-    console.log("Created a nurse profile with ID: ", docRef.id);
-
+    await adminDb.collection('nurses').doc(uid).set({
+      ...nurseData,
+      name,
+      imageURL: 'https://placehold.co/200x200.png',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
     revalidatePath('/admin/nurses');
     return { type: 'success', message: `Added nurse ${name}` };
@@ -61,10 +67,9 @@ export async function updateNurse(id: string, prevState: any, formData: FormData
   }
 
   try {
-    const { name, ward, shift, status } = validatedFields.data;
-    await adminDb.collection('nurses').doc(id).update({ ward, shift, status });
+    const { name, email, ...nurseData } = validatedFields.data;
+    await adminDb.collection('nurses').doc(id).update(nurseData);
     
-    // Also update the fullName in the corresponding /users document
     const userRef = adminDb.collection('users').doc(id);
     await userRef.update({ fullName: name });
 
@@ -79,8 +84,7 @@ export async function updateNurse(id: string, prevState: any, formData: FormData
 export async function deleteNurse(id: string) {
     try {
         await adminDb.collection('nurses').doc(id).delete();
-        // You would also delete or disable the user in the /users collection and Auth
-        // await adminDb.collection('users').doc(id).delete();
+        await adminDb.collection('users').doc(id).delete();
         revalidatePath('/admin/nurses');
         return { type: 'success', message: 'Nurse profile deleted successfully.' };
     } catch (e) {

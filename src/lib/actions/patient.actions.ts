@@ -31,15 +31,31 @@ export async function addPatient(prevState: any, formData: FormData) {
     };
   }
 
+  const { name, email, ...patientData } = validatedFields.data;
+
   try {
-    await adminDb.collection('patients').add({
-      ...validatedFields.data,
+    const userRef = adminDb.collection('users').doc();
+    const uid = userRef.id;
+
+    await userRef.set({
+      uid,
+      fullName: name,
+      email,
+      role: 'patient',
+      profileImage: `https://placehold.co/128x128.png`,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await adminDb.collection('patients').doc(uid).set({
+      ...patientData,
+      name,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     revalidatePath('/admin/patients');
-    return { type: 'success', message: `Added patient ${validatedFields.data.name}` };
+    return { type: 'success', message: `Added patient ${name}` };
   } catch (error) {
+    console.error("Error adding patient:", error);
     return { type: 'error', message: 'Database Error: Failed to Create Patient.' };
   }
 }
@@ -54,12 +70,22 @@ export async function updatePatient(id: string, prevState: any, formData: FormDa
       message: 'Missing Fields. Failed to Update Patient.',
     };
   }
+  const { name, email, ...patientData } = validatedFields.data;
 
   try {
-    await adminDb.collection('patients').doc(id).update(validatedFields.data);
+    await adminDb.collection('patients').doc(id).update({
+        ...patientData,
+        name,
+    });
+    
+    const userRef = adminDb.collection('users').doc(id);
+    await userRef.update({ fullName: name });
+
+
     revalidatePath('/admin/patients');
-    return { type: 'success', message: `Updated patient ${validatedFields.data.name}` };
+    return { type: 'success', message: `Updated patient ${name}` };
   } catch (error) {
+    console.error("Error updating patient:", error);
     return { type: 'error', message: 'Database Error: Failed to Update Patient.' };
   }
 }
@@ -67,9 +93,11 @@ export async function updatePatient(id: string, prevState: any, formData: FormDa
 export async function deletePatient(id: string) {
     try {
         await adminDb.collection('patients').doc(id).delete();
+        await adminDb.collection('users').doc(id).delete();
         revalidatePath('/admin/patients');
         return { type: 'success', message: 'Patient deleted successfully.' };
     } catch (e) {
+        console.error("Error deleting patient:", e);
         return { type: 'error', message: 'Database Error: Failed to Delete Patient.' };
     }
 }

@@ -90,8 +90,8 @@ export function NurseActions(props: NurseActionsProps) {
             </div>
              <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" defaultValue={defaultValues.email} readOnly />
-               <p className="text-xs text-muted-foreground">Email is tied to auth and cannot be changed here.</p>
+              <Input id="email" name="email" type="email" defaultValue={defaultValues.email} readOnly={mode === 'edit'} />
+               { mode === 'add' && <p className="text-xs text-muted-foreground">The user will be invited via this email.</p> }
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -132,7 +132,7 @@ export function NurseActions(props: NurseActionsProps) {
             <AlertDialogHeader>
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the nurse's profile.
+                This action cannot be undone. This will permanently delete the nurse's profile and user record.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

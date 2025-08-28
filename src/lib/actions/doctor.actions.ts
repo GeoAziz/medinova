@@ -9,6 +9,7 @@ import admin from 'firebase-admin';
 // Schema for detailed doctor profile in /doctors collection
 const doctorProfileSchema = z.object({
   name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
   specialty: z.string().min(1, 'Specialty is required'),
   department: z.string().min(1, 'Department is required'),
   bio: z.string().optional(),
@@ -17,15 +18,7 @@ const doctorProfileSchema = z.object({
 
 
 export async function addDoctor(prevState: any, formData: FormData) {
-  // This action is for creating the DOCTOR-SPECIFIC profile.
-  // The USER part (auth, email, role) should be handled separately for security.
-  const validatedFields = doctorProfileSchema.safeParse({
-    name: formData.get('name'),
-    specialty: formData.get('specialty'),
-    department: formData.get('department'),
-    bio: formData.get('bio'),
-    schedule: formData.get('schedule'),
-  });
+  const validatedFields = doctorProfileSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -35,12 +28,25 @@ export async function addDoctor(prevState: any, formData: FormData) {
     };
   }
 
+  const { name, email, specialty, department, bio, schedule } = validatedFields.data;
+
   try {
-    const { name, specialty, department, bio, schedule } = validatedFields.data;
-    // Note: In a real app, you'd create the user in Firebase Auth first,
-    // get their UID, and use that UID as the document ID here.
-    // For this prototype, we'll create a new doc with an auto-ID.
-    const docRef = await adminDb.collection('doctors').add({
+    // This is a simplified approach. In a real app, you would create the user in Auth first.
+    const userRef = adminDb.collection('users').doc();
+    const uid = userRef.id;
+
+    // 1. Create the record in the /users collection
+    await userRef.set({
+      uid,
+      fullName: name,
+      email,
+      role: 'doctor',
+      profileImage: `https://placehold.co/128x128.png`,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // 2. Create the record in the /doctors collection using the same UID
+    await adminDb.collection('doctors').doc(uid).set({
       name,
       specialty,
       department,
@@ -50,9 +56,6 @@ export async function addDoctor(prevState: any, formData: FormData) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       status: 'Active', // Default status
     });
-    
-    // This is a simplified approach. A full implementation would link this to a user in /users.
-    console.log("Created a doctor profile with ID: ", docRef.id);
 
     revalidatePath('/admin/doctors');
     return { type: 'success', message: `Added doctor profile for ${name}` };
@@ -63,13 +66,7 @@ export async function addDoctor(prevState: any, formData: FormData) {
 }
 
 export async function updateDoctor(id: string, prevState: any, formData: FormData) {
-  const validatedFields = doctorProfileSchema.safeParse({
-    name: formData.get('name'),
-    specialty: formData.get('specialty'),
-    department: formData.get('department'),
-    bio: formData.get('bio'),
-    schedule: formData.get('schedule'),
-  });
+  const validatedFields = doctorProfileSchema.safeParse(Object.fromEntries(formData.entries()));
 
   if (!validatedFields.success) {
     return {
@@ -80,7 +77,7 @@ export async function updateDoctor(id: string, prevState: any, formData: FormDat
   }
 
   try {
-     const { name, ...doctorData } = validatedFields.data;
+     const { name, email, ...doctorData } = validatedFields.data;
      const updateData: any = {
         ...doctorData,
         name,
@@ -104,11 +101,8 @@ export async function updateDoctor(id: string, prevState: any, formData: FormDat
 
 export async function deleteDoctor(id: string) {
     try {
-        // This is a soft delete for the prototype.
-        // In a real app, you might disable the user in Auth, archive the doc, etc.
         await adminDb.collection('doctors').doc(id).delete();
-        // You would also delete or disable the user in the /users collection and Auth
-        // await adminDb.collection('users').doc(id).delete();
+        await adminDb.collection('users').doc(id).delete();
         
         revalidatePath('/admin/doctors');
         return { type: 'success', message: 'Doctor profile deleted successfully.' };

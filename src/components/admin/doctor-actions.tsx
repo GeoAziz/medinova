@@ -91,8 +91,8 @@ export function DoctorActions(props: DoctorActionsProps) {
               </div>
                <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" defaultValue={defaultValues.email} readOnly />
-                <p className="text-xs text-muted-foreground">Email is tied to auth and cannot be changed here.</p>
+                <Input id="email" name="email" type="email" defaultValue={defaultValues.email} readOnly={mode === 'edit'} />
+                 { mode === 'add' && <p className="text-xs text-muted-foreground">The user will be invited via this email.</p> }
               </div>
               <div className="space-y-2">
                 <Label htmlFor="specialty">Specialty</Label>
@@ -131,7 +131,7 @@ export function DoctorActions(props: DoctorActionsProps) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the doctor's profile.
+                  This action cannot be undone. This will permanently delete the doctor's profile and user record.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
