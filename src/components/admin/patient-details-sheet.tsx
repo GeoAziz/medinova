@@ -10,27 +10,69 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
-import { FileText, Calendar, Stethoscope, User, HeartPulse, Activity, Thermometer, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { FileText, Calendar, Stethoscope, User, AlertTriangle, ShieldCheck, Activity } from 'lucide-react';
 import type { Patient } from '@/app/(main)/admin/patients/page';
 import type { Doctor } from '@/app/(main)/admin/doctors/page';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
 import { ScrollArea } from '../ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { adminDb } from '@/lib/firebase-admin';
+import { useEffect, useState, useCallback } from 'react';
 
-// Mock data for timeline - this would be fetched in a real scenario
-const mockVisitTimeline = [
-  { id: 1, date: '2024-08-15', event: 'Scheduled Appointment with Dr. Reed (Cardiology)' },
-  { id: 2, date: '2024-07-20', event: 'Admitted to Cardiovascular Wing, Room 301-B' },
-  { id: 3, date: '2024-07-21', event: 'ECG and Bloodwork performed' },
-  { id: 4, date: '2024-07-22', event: 'Diagnosis: Arrhythmia. Treatment plan initiated.' },
-];
+type PatientEvent = {
+    id: string;
+    timestamp: any; 
+    eventType: string;
+    description: string;
+    actorId: string;
+}
+
+// NOTE: This component uses the Firebase Admin SDK on the client side for prototyping convenience.
+// In a production environment, this data fetching MUST be moved to a secure API route (a server action)
+// that enforces security rules to ensure an admin is authorized to view this data.
+async function getPatientEvents(patientId: string): Promise<PatientEvent[]> {
+    if (!adminDb) {
+        console.error("Firestore not available");
+        return [];
+    }
+    const snapshot = await adminDb.collection('patients').doc(patientId).collection('patient_events').orderBy('timestamp', 'desc').get();
+    return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+    })) as PatientEvent[];
+}
+
 
 export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, doctors: Doctor[] }) {
+    const [timeline, setTimeline] = useState<PatientEvent[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const fetchTimeline = useCallback(async () => {
+        if (!patient.id) return;
+        setIsLoading(true);
+        try {
+            const events = await getPatientEvents(patient.id);
+            setTimeline(events);
+        } catch (error) {
+            console.error("Failed to fetch patient timeline:", error);
+            // In a real app, you would show a toast message here.
+        } finally {
+            setIsLoading(false);
+        }
+    }, [patient.id]);
+
+    useEffect(() => {
+        if (isOpen) {
+            fetchTimeline();
+        }
+    }, [isOpen, fetchTimeline]);
+
     const assignedDoctorName = doctors.find(d => d.id === patient.assignedDoctor)?.name || 'N/A';
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button size="icon" variant="outline"><FileText className="h-4 w-4" /></Button>
       </SheetTrigger>
@@ -46,7 +88,7 @@ export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, do
                         <div>
                             <SheetTitle className="text-2xl">{patient.name}</SheetTitle>
                             <SheetDescription>
-                                Patient ID: {patient.id} | {patient.age} years old, {patient.gender}
+                                Patient ID: {patient.id.substring(0, 8)}... | {patient.age} years old, {patient.gender}
                             </SheetDescription>
                         </div>
                     </div>
@@ -89,20 +131,26 @@ export function PatientDetailsSheet({ patient, doctors }: { patient: Patient, do
                             <CardTitle className="text-lg">Visit Timeline</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <ul className="space-y-4">
-                                {mockVisitTimeline.map(item => (
-                                <li key={item.id} className="flex gap-4">
-                                    <div className="flex flex-col items-center">
-                                    <div className="w-4 h-4 rounded-full bg-primary mt-1"></div>
-                                    <div className="flex-1 w-px bg-border"></div>
-                                    </div>
-                                    <div>
-                                    <p className="font-semibold">{item.event}</p>
-                                    <p className="text-xs text-muted-foreground">{item.date}</p>
-                                    </div>
-                                </li>
-                                ))}
-                            </ul>
+                           {isLoading ? (
+                                <p>Loading timeline...</p>
+                            ) : timeline.length > 0 ? (
+                                <ul className="space-y-4">
+                                    {timeline.map(item => (
+                                    <li key={item.id} className="flex gap-4">
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-4 h-4 rounded-full bg-primary mt-1"></div>
+                                            { item.id !== timeline[timeline.length - 1].id && <div className="flex-1 w-px bg-border"></div> }
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold">{item.description}</p>
+                                            <p className="text-xs text-muted-foreground">{new Date(item.timestamp.seconds * 1000).toLocaleString()}</p>
+                                        </div>
+                                    </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">No timeline events found for this patient.</p>
+                            )}
                         </CardContent>
                     </Card>
 

@@ -43,21 +43,43 @@ export async function addPatient(prevState: any, formData: FormData) {
 
     await adminAuth.setCustomUserClaims(uid, { role: 'patient' });
 
-    await adminDb.collection('users').doc(uid).set({
+    const userProfile = {
       uid,
       fullName: name,
       email,
       role: 'patient',
       profileImage: `https://placehold.co/128x128.png`,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    };
+    
+    const patientProfile = {
+        ...patientData,
+        name,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    
+    // Log initial event
+    const initialEvent = {
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        eventType: 'PATIENT_REGISTERED',
+        description: `Patient profile created and registered in the system.`,
+        actorId: 'admin', // Or the admin's UID if available
+    };
 
-    await adminDb.collection('patients').doc(uid).set({
-      ...patientData,
-      name,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
+    // Use a batch to write all documents atomically
+    const batch = adminDb.batch();
+    
+    const userRef = adminDb.collection('users').doc(uid);
+    batch.set(userRef, userProfile);
+    
+    const patientRef = adminDb.collection('patients').doc(uid);
+    batch.set(patientRef, patientProfile);
 
+    const eventRef = adminDb.collection('patients').doc(uid).collection('patient_events').doc();
+    batch.set(eventRef, initialEvent);
+
+    await batch.commit();
+    
     const link = await adminAuth.generatePasswordResetLink(email);
 
     revalidatePath('/admin/patients');
