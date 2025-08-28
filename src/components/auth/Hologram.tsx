@@ -17,15 +17,15 @@ function WireframeDNA() {
           <>
             <mesh position={[x, y, z]} key={`sphere1-${i}`}>
               <sphereGeometry args={[0.13, 16, 16]} />
-              <meshBasicMaterial color="#0ff" wireframe opacity={0.7} />
+              <meshStandardMaterial color="#7dd3fc" emissive="#0ea5e9" emissiveIntensity={0.5} />
             </mesh>
             <mesh position={[-x, y, -z]} key={`sphere2-${i}`}>
               <sphereGeometry args={[0.13, 16, 16]} />
-              <meshBasicMaterial color="#f0f" wireframe opacity={0.7} />
+              <meshStandardMaterial color="#c084fc" emissive="#a21caf" emissiveIntensity={0.5} />
             </mesh>
             <mesh position={[0, y, 0]} key={`cylinder-${i}`}>
               <cylinderGeometry args={[0.04, 0.04, 2.4, 8]} />
-              <meshBasicMaterial color="#fff" wireframe opacity={0.3} />
+              <meshStandardMaterial color="#fff" opacity={0.15} transparent />
             </mesh>
           </>
         );
@@ -37,8 +37,9 @@ function WireframeDNA() {
 export default function Hologram() {
   return (
     <Canvas camera={{ position: [0, 0, 7], fov: 50 }} style={{ width: '100%', height: '100%' }}>
-      <ambientLight intensity={0.5} />
-      <Float speed={1.2} rotationIntensity={0.7} floatIntensity={0.8}>
+      <ambientLight intensity={0.7} />
+      <directionalLight position={[2, 4, 2]} intensity={0.7} />
+      <Float speed={1.2} rotationIntensity={0.5} floatIntensity={0.7}>
         <WireframeDNA />
       </Float>
     </Canvas>
