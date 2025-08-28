@@ -2,13 +2,13 @@
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserPlus, AlertTriangle, Edit, Trash2, Search } from 'lucide-react';
+import { AlertTriangle, Search } from 'lucide-react';
 import { adminDb } from '@/lib/firebase-admin';
 import admin from 'firebase-admin';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { RecordsOfficerActions } from '@/components/admin/records-officer-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
 
@@ -45,7 +45,7 @@ async function getRecordsOfficers(query: string) {
         recordAccessLogs: officerRecord.recordAccessLogs,
         reportsGenerated: officerRecord.reportsGenerated,
         imageURL: officerRecord.imageURL,
-        createdAt: officerRecord.createdAt?.toDate().toLocaleDateString() || 'N/A',
+        createdAt: user.createdAt?.toDate().toLocaleDateString() || 'N/A',
       };
     }).sort((a, b) => a.name.localeCompare(b.name));
     
@@ -56,6 +56,9 @@ async function getRecordsOfficers(query: string) {
     return null;
   }
 }
+
+export type RecordsOfficer = Exclude<Awaited<ReturnType<typeof getRecordsOfficers>>, null>[0];
+
 
 export default async function AdminRecordsOfficersPage({ searchParams }: { searchParams?: { query?: string; } }) {
   const query = searchParams?.query || '';
@@ -78,7 +81,7 @@ export default async function AdminRecordsOfficersPage({ searchParams }: { searc
       <PageHeader
         title="Medical Records Officer Management"
         description="Manage MRO profiles and data access permissions."
-        actions={<Button><UserPlus className="mr-2 h-4 w-4" /> Add Officer</Button>}
+        actions={<RecordsOfficerActions mode="add" />}
       />
       <GlowingCard>
         <CardHeader>
@@ -130,10 +133,7 @@ export default async function AdminRecordsOfficersPage({ searchParams }: { searc
                     <TableCell>{item.reportsGenerated}</TableCell>
                     <TableCell>{item.createdAt}</TableCell>
                     <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                            <Button size="icon" variant="outline"><Edit className="h-4 w-4" /></Button>
-                            <Button size="icon" variant="destructive"><Trash2 className="h-4 w-4" /></Button>
-                        </div>
+                        <RecordsOfficerActions mode="edit" officer={item} />
                     </TableCell>
                   </TableRow>
                 ))}

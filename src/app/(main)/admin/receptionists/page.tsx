@@ -2,13 +2,13 @@
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserPlus, AlertTriangle, Edit, Trash2, Search } from 'lucide-react';
+import { AlertTriangle, Search } from 'lucide-react';
 import { adminDb } from '@/lib/firebase-admin';
 import admin from 'firebase-admin';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { ReceptionistActions } from '@/components/admin/receptionist-actions';
 import { Input } from '@/components/ui/input';
 import { User } from '@/lib/types';
 
@@ -57,6 +57,9 @@ async function getReceptionists(query: string) {
   }
 }
 
+export type Receptionist = Exclude<Awaited<ReturnType<typeof getReceptionists>>, null>[0];
+
+
 export default async function AdminReceptionistsPage({ searchParams }: { searchParams?: { query?: string; } }) {
   const query = searchParams?.query || '';
   const receptionists = await getReceptionists(query);
@@ -78,7 +81,7 @@ export default async function AdminReceptionistsPage({ searchParams }: { searchP
       <PageHeader
         title="Receptionist Management"
         description="Manage receptionist profiles and front-desk permissions."
-        actions={<Button><UserPlus className="mr-2 h-4 w-4" /> Add Receptionist</Button>}
+        actions={<ReceptionistActions mode="add" />}
       />
       <GlowingCard>
         <CardHeader>
@@ -130,10 +133,7 @@ export default async function AdminReceptionistsPage({ searchParams }: { searchP
                     <TableCell>{item.incomingCalls}</TableCell>
                     <TableCell>{item.createdAt}</TableCell>
                     <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                            <Button size="icon" variant="outline"><Edit className="h-4 w-4" /></Button>
-                            <Button size="icon" variant="destructive"><Trash2 className="h-4 w-4" /></Button>
-                        </div>
+                       <ReceptionistActions mode="edit" receptionist={item} />
                     </TableCell>
                   </TableRow>
                 ))}
