@@ -31,6 +31,12 @@ import { UserPlus, Edit, Trash2, Users, Copy } from 'lucide-react';
 import { Textarea } from '../ui/textarea';
 import type { Doctor } from '@/app/(main)/admin/doctors/page';
 import { addDoctor, updateDoctor, deleteDoctor } from '@/lib/actions/doctor.actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+
+const specialties = ["Cardiology", "Neurology", "Dermatology", "Orthopedics", "Pediatrics", "Oncology", "Radiology", "Emergency Medicine"];
+const departments = ["Medical", "Surgical", "Pediatrics", "Emergency", "Diagnostics", "Outpatient"];
+const schedules = ["Mon-Fri (9am-5pm)", "Rotating Shifts", "Night Shift (7pm-7am)", "Weekend Coverage", "On-Call"];
+
 
 type DoctorActionsProps = 
   | { mode: 'add'; }
@@ -110,15 +116,36 @@ export function DoctorActions(props: DoctorActionsProps) {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="specialty">Specialty</Label>
-                <Input id="specialty" name="specialty" defaultValue={defaultValues.specialty} required />
+                <Select name="specialty" defaultValue={defaultValues.specialty} required>
+                    <SelectTrigger id="specialty">
+                        <SelectValue placeholder="Select specialty..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {specialties.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="department">Department</Label>
-                <Input id="department" name="department" defaultValue={defaultValues.department} required />
+                 <Select name="department" defaultValue={defaultValues.department} required>
+                    <SelectTrigger id="department">
+                        <SelectValue placeholder="Select department..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                         {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                </Select>
               </div>
                <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="schedule">Schedule</Label>
-                <Input id="schedule" name="schedule" defaultValue={defaultValues.schedule} />
+                <Select name="schedule" defaultValue={defaultValues.schedule}>
+                    <SelectTrigger id="schedule">
+                        <SelectValue placeholder="Select schedule..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                         {schedules.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                </Select>
               </div>
                <div className="space-y-2 md:col-span-2">
                 <Label htmlFor="bio">Bio</Label>
