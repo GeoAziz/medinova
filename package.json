@@ -1,3 +1,4 @@
+
 {
   "name": "zizo_mediverse",
   "version": "0.1.0",
@@ -10,7 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx src/lib/seed.ts"
+    "seed": "tsx src/lib/seed.ts",
+    "create:admin": "tsx src/lib/create-admin.ts"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.15.5",
