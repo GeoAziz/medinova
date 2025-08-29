@@ -1,101 +1,81 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     // ================================================
-    // 🔷 ZIZO_MEDIVERSE: Core Application Rules
+    // 🔷 ZIZO_MEDIVERSE: Main Medical Platform Rules
     // ================================================
-
-    // Users can only read/update their own profile. Admins can view all.
-    match /users/{userId} {
-      allow read, update: if request.auth.uid == userId || isAdmin();
-      allow list: if isAdmin();
-      allow create: if request.auth != null; // Anyone can create a user doc (on signup)
-      allow delete: if isAdmin(); // Only admins can delete users
+    match /zizo_mediverse/{docId} {
+      allow read, write: if false; // restrict direct root-level access
     }
 
-    // Rules for the 'patients' collection and its sub-collections
-    match /patients/{patientId} {
-      // A user can read/write their own patient document
-      allow read, update: if request.auth.uid == patientId || isAdmin();
-      allow create: if isAdmin() || isReceptionist(); // Admins or Receptionists can create patients
+    match /users/{userId} {
+      // Admins can list and read all users. Other users can only read/update their own document.
+      allow list: if isAdmin();
+      allow read, update: if request.auth.uid == userId || isAdmin();
+      allow create: if request.auth != null;
       allow delete: if isAdmin();
+    }
+    
+    // This is the primary change: Rules are now nested to match the database structure.
+    match /patients/{patientId} {
+      // Allow a user to read/write their own patient document.
+      allow read, update: if request.auth.uid == patientId || isAdmin() || isDoctor() || isNurse();
+      allow create: if isPatient() || isAdmin() || isReceptionist();
 
-      // Rules for patient-specific appointments
       match /appointments/{appointmentId} {
-        allow read, create: if request.auth.uid == patientId;
-        allow list: if request.auth.uid == patientId;
-        allow update, delete: if isDoctor() || isReceptionist() || request.auth.uid == patientId;
+        // A user can read/create/update their own appointments. Doctors/receptionists can manage them.
+        allow read, create, update: if request.auth.uid == patientId;
+        allow read, create, update, delete: if isDoctor() || isReceptionist() || isAdmin();
       }
 
-      // Rules for patient-specific prescriptions
       match /prescriptions/{prescriptionId} {
-        allow read: if request.auth.uid == patientId || isDoctor() || isPharmacist();
-        allow list: if request.auth.uid == patientId || isDoctor() || isPharmacist();
+        // A user can read their own prescriptions.
+        allow read: if request.auth.uid == patientId || isPharmacist() || isDoctor();
+        // Only doctors can create/update prescriptions for a patient.
         allow create, update: if isDoctor();
       }
+      
+      match /medical_history/{recordId} {
+        allow read, write: if isDoctor() || isNurse() || isMedicalRecordsOfficer() || request.auth.uid == patientId;
+      }
+      
+      match /scans/{scanId} {
+        allow read, create, update: if isRadiologist() || isDoctor();
+        allow read: if request.auth.uid == patientId;
+      }
+      
+      match /lab_tests/{testId} {
+          allow read, create, update: if isLabScientist() || isDoctor();
+          allow read: if request.auth.uid == patientId;
+      }
 
-       // Rules for patient timeline events
       match /patient_events/{eventId} {
-        allow read: if request.auth.uid == patientId || isDoctor() || isAdmin();
-        allow list: if request.auth.uid == patientId || isDoctor() || isAdmin();
-        allow create: if request.auth.uid != null; // Allow any authenticated user to create an event
+        allow read: if request.auth.uid == patientId || isAdmin() || isDoctor() || isNurse();
+        allow create: if request.auth != null; // Any authenticated user can create an event for a patient (e.g. doctor, patient, system)
       }
     }
 
-    // Rules for top-level collections
     match /doctors/{doctorId} {
-      allow read: if request.auth.uid != null;
-      allow list: if request.auth.uid != null;
-      allow create, update, delete: if isAdmin();
+        allow read, update: if request.auth.uid == doctorId || isAdmin();
+        allow create, delete: if isAdmin();
     }
     
-    match /nurses/{nurseId} {
-      allow read: if request.auth.uid != null;
-      allow list: if request.auth.uid != null;
-      allow create, update, delete: if isAdmin();
-    }
-    
-    match /pharmacists/{pharmacistId} {
-      allow read: if request.auth.uid != null;
-      allow list: if request.auth.uid != null;
-      allow create, update, delete: if isAdmin();
-    }
-    
-    match /labScientists/{scientistId} {
-      allow read: if request.auth.uid != null;
-      allow list: if request.auth.uid != null;
-      allow create, update, delete: if isAdmin();
-    }
-
-    match /radiologists/{radiologistId} {
-        allow read: if request.auth.uid != null;
-        allow list: if request.auth.uid != null;
-        allow create, update, delete: if isAdmin();
-    }
-    
-    match /receptionists/{receptionistId} {
-        allow read: if request.auth.uid != null;
-        allow list: if request.auth.uid != null;
-        allow create, update, delete: if isAdmin();
-    }
-    
-    match /medicalRecordsOfficers/{officerId} {
-        allow read: if request.auth.uid != null;
-        allow list: if request.auth.uid != null;
-        allow create, update, delete: if isAdmin();
+    // Standalone collections that are NOT nested under a patient
+    match /inventory/{itemId} {
+      allow read, write: if isPharmacist() || isAdmin();
     }
 
     match /systemLogs/{logId} {
-      allow read: if isAdmin();
-      allow list: if isAdmin();
-      allow write: if false; // Logs should only be written by backend services
+      // Admins can read and list all system logs.
+      allow list, read: if isAdmin();
+      allow write: if false; // Should be written by backend functions only
     }
 
     // ================================================
-    // 🔷 Helper Functions
+    // Helper Functions
     // ================================================
-
     function isPatient() {
       return request.auth.token.role == "patient";
     }
@@ -130,6 +110,77 @@ service cloud.firestore {
 
     function isMedicalRecordsOfficer() {
       return request.auth.token.role == "medical_records_officer";
+    }
+
+
+    // ================================================
+    // 🔷 BIOSCAN: Medical Diagnostics Device Rules
+    // ================================================
+    match /bioscan_data/{scanId} {
+      allow create: if isDevice();
+      allow read: if isDoctor() || isLabScientist() || isRadiologist();
+    }
+
+    match /bioscan_logs/{logId} {
+      allow read: if isAdmin();
+    }
+
+    function isDevice() {
+      return request.auth.token.role == "bioscan_device";
+    }
+
+
+    // ================================================
+    // 🔷 MEDBILL: Billing & Payments Rules
+    // ================================================
+    match /bills/{billId} {
+      allow create: if isReceptionist() || isAdmin();
+      allow read: if isPatient() || isAdmin();
+      allow update: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow create: if isPatient();
+      allow read: if isAdmin() || isPatient();
+    }
+
+
+    // ================================================
+    // 🔷 ZIZO_HOSPISYNC: Hospital Network Sync
+    // ================================================
+    match /hospital_branches/{branchId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /staffSync/{syncId} {
+      allow read, write: if isAdmin();
+    }
+
+
+    // ================================================
+    // 🔷 HEALTHVAULT: Secure Data Backup System
+    // ================================================
+    match /backups/{backupId} {
+      allow create, read: if isAdmin();
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isMedicalRecordsOfficer() || isAdmin();
+    }
+
+
+    // ================================================
+    // 🔷 INSURASYNC: Insurance Verification Module
+    // ================================================
+    match /insuranceClaims/{claimId} {
+      allow create, read: if isPatient() || isReceptionist();
+      allow update: if isAdmin();
+    }
+
+    match /insurancePolicies/{policyId} {
+      allow read: if isPatient() || isAdmin();
+      allow write: if isAdmin();
     }
   }
 }
