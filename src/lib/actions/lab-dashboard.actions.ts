@@ -4,7 +4,7 @@
 import { adminDb } from '@/lib/firebase-admin';
 import type { LabTest } from '@/lib/types';
 
-export async function getLabDashboardData() {
+export async function getLabDashboardData(query?: string) {
   try {
     // collectionGroup allows us to query across all 'lab_tests' subcollections
     // regardless of the parent patient document. This is efficient for this role.
@@ -19,7 +19,7 @@ export async function getLabDashboardData() {
         };
     }
 
-    const allTests: LabTest[] = [];
+    let allTests: LabTest[] = [];
 
     for (const doc of labTestsSnapshot.docs) {
         const data = doc.data();
@@ -39,6 +39,18 @@ export async function getLabDashboardData() {
             receivedDate: data.createdAt?.toDate().toLocaleDateString() || new Date().toLocaleDateString(),
         });
     }
+
+    // Filter based on the query, if provided
+    if (query) {
+        const lowercasedQuery = query.toLowerCase();
+        allTests = allTests.filter(test => 
+            test.patientName.toLowerCase().includes(lowercasedQuery) ||
+            test.patientId.toLowerCase().includes(lowercasedQuery) ||
+            test.testType.toLowerCase().includes(lowercasedQuery) ||
+            test.id.toLowerCase().includes(lowercasedQuery)
+        );
+    }
+
 
     const pendingTests = allTests.filter(t => t.status === 'Pending').length;
     const rejectedSamples = allTests.filter(t => t.status === 'Rejected').length;
