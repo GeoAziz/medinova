@@ -1,5 +1,6 @@
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -50,4 +51,14 @@ export type Appointment = {
   date: string;
   time: string;
   status: 'Upcoming' | 'Completed' | 'Cancelled';
+};
+
+export type LabTest = {
+  id: string;
+  patientName: string;
+  patientId: string;
+  testType: string;
+  requestingDoctor: string;
+  status: 'Pending' | 'In Progress' | 'Completed' | 'Rejected';
+  receivedDate: string;
 };

@@ -4,14 +4,12 @@ import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockLabTests } from '@/lib/data';
 import { Beaker, FlaskConical, CheckCircle2, AlertTriangle, PlayCircle, BarChart, XCircle } from 'lucide-react';
 import Link from 'next/link';
+import { getLabDashboardData } from '@/lib/actions/lab-dashboard.actions';
 
-export default function LabDashboard() {
-  const pendingTests = mockLabTests.filter(t => t.status === 'Pending').length;
-  const completedToday = mockLabTests.filter(t => t.status === 'Completed').length; // Mock data
-  const rejectedSamples = mockLabTests.filter(t => t.status === 'Rejected').length;
+export default async function LabDashboard() {
+  const { allTests, pendingTests, completedToday, rejectedSamples } = await getLabDashboardData();
 
   return (
     <div className="animate-fade-in-up space-y-6">
@@ -63,7 +61,7 @@ export default function LabDashboard() {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">Results flagged for immediate review</p>
           </CardContent>
         </GlowingCard>
@@ -74,45 +72,52 @@ export default function LabDashboard() {
           <CardTitle>Incoming Test Queue</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Test ID</TableHead>
-                <TableHead>Patient</TableHead>
-                <TableHead>Test Type</TableHead>
-                <TableHead>Doctor</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockLabTests.map(test => (
-                <TableRow key={test.id}>
-                  <TableCell>{test.id}</TableCell>
-                  <TableCell>{test.patientName}</TableCell>
-                  <TableCell>{test.testType}</TableCell>
-                  <TableCell>{test.requestingDoctor}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={
-                        test.status === 'Completed' ? 'default' : 
-                        test.status === 'In Progress' ? 'secondary' : 
-                        test.status === 'Rejected' ? 'outline' : 'destructive'
-                      }
-                      className={test.status === 'Completed' ? 'bg-green-600/80' : ''}
-                    >
-                      {test.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href="/lab/workbench">Process</Link>
-                    </Button>
-                  </TableCell>
+          {allTests.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Test ID</TableHead>
+                  <TableHead>Patient</TableHead>
+                  <TableHead>Test Type</TableHead>
+                  <TableHead>Doctor</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {allTests.slice(0, 10).map(test => (
+                  <TableRow key={test.id}>
+                    <TableCell className="font-mono text-xs">{test.id.substring(0,8)}...</TableCell>
+                    <TableCell>{test.patientName}</TableCell>
+                    <TableCell>{test.testType}</TableCell>
+                    <TableCell>{test.requestingDoctor}</TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={
+                          test.status === 'Completed' ? 'default' : 
+                          test.status === 'In Progress' ? 'secondary' : 
+                          test.status === 'Rejected' ? 'outline' : 'destructive'
+                        }
+                        className={test.status === 'Completed' ? 'bg-green-600/80' : ''}
+                      >
+                        {test.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="outline" size="sm" asChild>
+                          <Link href="/lab/workbench">Process</Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+                <Beaker className="mx-auto h-12 w-12 mb-4" />
+                <p>The test queue is currently empty.</p>
+            </div>
+          )}
         </CardContent>
       </GlowingCard>
     </div>
