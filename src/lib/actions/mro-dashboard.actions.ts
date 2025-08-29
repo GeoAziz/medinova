@@ -5,14 +5,14 @@ import { adminDb } from '@/lib/firebase-admin';
 import type { RecordAccessRequest, User } from '@/lib/types';
 import admin from 'firebase-admin';
 
-export async function getMroDashboardData() {
+export async function getMroDashboardData(query?: string) {
     try {
         const accessRequestsSnapshot = await adminDb.collection('access_requests').orderBy('date', 'desc').get();
         if (accessRequestsSnapshot.empty) {
             return { accessRequests: [], pendingRequestsCount: 0 };
         }
 
-        const requestsData = accessRequestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+        let requestsData = accessRequestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
 
         // Collect all unique user IDs to fetch their names
         const userIds = new Set<string>();
@@ -29,7 +29,7 @@ export async function getMroDashboardData() {
             });
         }
         
-        const accessRequests: RecordAccessRequest[] = requestsData.map(req => ({
+        let accessRequests: RecordAccessRequest[] = requestsData.map(req => ({
             id: req.id,
             requestingUserName: usersMap.get(req.requesting_user_id) || 'Unknown User',
             requestingUserRole: req.requestingRole || 'Unknown Role',
@@ -39,6 +39,14 @@ export async function getMroDashboardData() {
             status: req.status,
             date: req.date.toDate().toLocaleDateString(),
         }));
+        
+        if (query) {
+            const lowercasedQuery = query.toLowerCase();
+            accessRequests = accessRequests.filter(req => 
+                req.requestingUserName.toLowerCase().includes(lowercasedQuery) ||
+                req.patientName.toLowerCase().includes(lowercasedQuery)
+            );
+        }
 
         const pendingRequestsCount = accessRequests.filter(req => req.status === 'Pending').length;
 

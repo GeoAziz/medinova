@@ -1,15 +1,19 @@
+
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockAccessRequests } from '@/lib/data';
 import { Input } from '@/components/ui/input';
-import { Search, Check, X, ShieldQuestion } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getMroDashboardData } from '@/lib/actions/mro-dashboard.actions';
+import { AccessRequestActions } from '@/components/admin/access-request-actions';
 
-export default function MRORequestsPage() {
+export default async function MRORequestsPage({ searchParams }: { searchParams?: { query?: string } }) {
+  const query = searchParams?.query || '';
+  const { accessRequests } = await getMroDashboardData(query);
+
   return (
     <div className="animate-fade-in-up">
       <PageHeader
@@ -22,12 +26,14 @@ export default function MRORequestsPage() {
             <div>
               <CardTitle>All Access Requests</CardTitle>
               <CardDescription>
-                {mockAccessRequests.length} total requests in the system.
+                {accessRequests.length} total requests in the system.
               </CardDescription>
             </div>
             <div className="relative w-full max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by user, patient, or role..." className="pl-9" />
+                <form>
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search by user or patient name..." className="pl-9" name="query" defaultValue={query} />
+                </form>
             </div>
           </div>
         </CardHeader>
@@ -39,22 +45,24 @@ export default function MRORequestsPage() {
                   <TableHead>Requesting User</TableHead>
                   <TableHead>Patient</TableHead>
                   <TableHead>Reason</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockAccessRequests.map(req => (
+                {accessRequests.length > 0 ? accessRequests.map(req => (
                   <TableRow key={req.id}>
                     <TableCell>
-                      <div className="font-medium">{req.requestingUser}</div>
-                      <div className="text-xs text-muted-foreground">{req.requestingRole}</div>
+                      <div className="font-medium">{req.requestingUserName}</div>
+                      <div className="text-xs text-muted-foreground">{req.requestingUserRole}</div>
                     </TableCell>
                     <TableCell>
                         <div className="font-medium">{req.patientName}</div>
                         <div className="text-xs text-muted-foreground">{req.patientId}</div>
                     </TableCell>
                     <TableCell className="max-w-xs truncate">{req.reason}</TableCell>
+                    <TableCell>{req.date}</TableCell>
                     <TableCell>
                        <Badge 
                         variant={
@@ -67,20 +75,16 @@ export default function MRORequestsPage() {
                         </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                        <div className="flex gap-2 justify-end">
-                            <Button size="icon" variant="outline" disabled={req.status !== 'Pending'}>
-                                <Check className="h-4 w-4" />
-                            </Button>
-                             <Button size="icon" variant="outline" disabled={req.status !== 'Pending'}>
-                                <X className="h-4 w-4" />
-                            </Button>
-                             <Button size="icon" variant="outline">
-                                <ShieldQuestion className="h-4 w-4" />
-                            </Button>
-                        </div>
+                        <AccessRequestActions requestId={req.id} patientId={req.patientId} status={req.status} />
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={6} className="h-24 text-center">
+                            No access requests found for the current search query.
+                        </TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
           </ScrollArea>
