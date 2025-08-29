@@ -6,6 +6,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -120,4 +121,12 @@ export type ScanRequest = {
     status: 'Pending' | 'Reviewed' | 'Needs Re-scan';
     requestDate: string;
     imageUrl: string;
+};
+
+export type ReceptionistAppointment = {
+    id: string;
+    patientName: string;
+    doctorName: string;
+    time: string;
+    status: 'Confirmed' | 'Pending' | 'Arrived' | 'Checked-in' | 'Cancelled' | 'Upcoming';
 };
