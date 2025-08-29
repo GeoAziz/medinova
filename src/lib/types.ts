@@ -3,6 +3,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -86,4 +87,15 @@ export type NurseTask = {
     task: string;
     priority: 'High' | 'Medium' | 'Low';
     isCompleted: boolean;
+};
+
+export type PharmacistPrescription = {
+    id: string;
+    patientName: string;
+    patientId: string;
+    medication: string;
+    dosage: string;
+    requestingDoctor: string;
+    status: 'Pending' | 'Ready for Pickup' | 'Out of Stock' | 'Fulfilled';
+    receivedDate: string;
 };
