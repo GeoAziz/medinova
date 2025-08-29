@@ -62,6 +62,17 @@ service cloud.firestore {
         allow create, delete: if isAdmin();
     }
     
+    // NEW: Secure chat functionality
+    match /chats/{chatId} {
+      // Allow read/write access only to participants of the chat
+      allow read, write: if request.auth.uid in resource.data.participants;
+      
+      match /messages/{messageId} {
+        // Allow message read/create only if user is a participant of the parent chat
+        allow read, create: if request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+      }
+    }
+
     // Standalone collections that are NOT nested under a patient
     match /inventory/{itemId} {
       allow read, write: if isPharmacist() || isAdmin();
