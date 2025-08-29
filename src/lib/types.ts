@@ -1,6 +1,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -62,3 +63,15 @@ export type LabTest = {
   status: 'Pending' | 'In Progress' | 'Completed' | 'Rejected';
   receivedDate: string;
 };
+
+export type RecordAccessRequest = {
+  id: string;
+  requestingUserName: string;
+  requestingUserRole: string;
+  patientId: string;
+  patientName: string;
+  reason: string;
+  status: 'Pending' | 'Approved' | 'Denied';
+  date: string;
+};
+

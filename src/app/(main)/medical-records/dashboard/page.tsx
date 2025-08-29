@@ -4,18 +4,20 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from '@/component
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockMedicalRecordsOfficer, mockAccessRequests } from '@/lib/data';
+import { getMroDashboardData } from '@/lib/actions/mro-dashboard.actions';
+import { getAuthenticatedUser } from '@/lib/actions/auth.actions';
 import { FileSearch, UserCheck, ShieldCheck, Bot } from 'lucide-react';
 import Link from 'next/link';
 
-export default function MRODashboard() {
-  const pendingRequests = mockAccessRequests.filter(r => r.status === 'Pending').length;
+export default async function MRODashboard() {
+  const user = await getAuthenticatedUser();
+  const { accessRequests, pendingRequestsCount } = await getMroDashboardData();
 
   return (
     <div className="animate-fade-in-up space-y-6">
       <PageHeader
         title="MRO Command Center"
-        description={`Welcome, ${mockMedicalRecordsOfficer.name}. All systems secure.`}
+        description={`Welcome, ${user?.fullName || 'Officer'}. All systems secure.`}
         actions={
           <div className="flex gap-2">
             <Button variant="outline"><Bot className="mr-2 h-4 w-4" /> Activate RecordsCore</Button>
@@ -31,7 +33,7 @@ export default function MRODashboard() {
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingRequests}</div>
+            <div className="text-2xl font-bold">{pendingRequestsCount}</div>
             <p className="text-xs text-muted-foreground">Awaiting review and approval</p>
           </CardContent>
         </GlowingCard>
@@ -41,8 +43,8 @@ export default function MRODashboard() {
             <FileSearch className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">To authorized personnel</p>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">To authorized personnel (mock)</p>
           </CardContent>
         </GlowingCard>
         <GlowingCard>
@@ -52,7 +54,7 @@ export default function MRODashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Nominal</div>
-            <p className="text-xs text-muted-foreground">No compliance alerts</p>
+            <p className="text-xs text-muted-foreground">No compliance alerts (mock)</p>
           </CardContent>
         </GlowingCard>
       </div>
@@ -74,11 +76,11 @@ export default function MRODashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockAccessRequests.slice(0, 5).map(req => (
+              {accessRequests.length > 0 ? accessRequests.slice(0, 5).map(req => (
                 <TableRow key={req.id}>
                   <TableCell>
-                    <div className="font-medium">{req.requestingUser}</div>
-                    <div className="text-xs text-muted-foreground">{req.requestingRole}</div>
+                    <div className="font-medium">{req.requestingUserName}</div>
+                    <div className="text-xs text-muted-foreground">{req.requestingUserRole}</div>
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">{req.patientName}</div>
@@ -102,7 +104,11 @@ export default function MRODashboard() {
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-24">No access requests found.</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
