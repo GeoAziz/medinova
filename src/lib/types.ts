@@ -24,3 +24,30 @@ export type ChatMessage = {
   text: string;
   timestamp: any;
 };
+
+export type Patient = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  age: number;
+  gender: string;
+  room: string;
+  nationalId?: string;
+  diagnosis?: string;
+  status?: string;
+  assignedDoctor?: string;
+  notes?: string;
+  createdAt: string;
+};
+
+export type Appointment = {
+  id: string;
+  patientId: string;
+  patientName: string;
+  doctorId: string;
+  doctorName: string;
+  date: string;
+  time: string;
+  status: 'Upcoming' | 'Completed' | 'Cancelled';
+};
