@@ -2,6 +2,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -35,6 +36,9 @@ export type Patient = {
   age: number;
   gender: string;
   room: string;
+  ward?: string;
+  condition?: string;
+  vitals?: { hr: number; bp: string; temp: number };
   nationalId?: string;
   diagnosis?: string;
   status?: string;
@@ -75,3 +79,11 @@ export type RecordAccessRequest = {
   date: string;
 };
 
+export type NurseTask = {
+    id: string;
+    patientName: string;
+    patientRoom: string;
+    task: string;
+    priority: 'High' | 'Medium' | 'Low';
+    isCompleted: boolean;
+};

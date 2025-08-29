@@ -4,20 +4,32 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from '@/component
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockNurseAssignedPatients, mockNurseTasks } from '@/lib/data';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 import { Users, ClipboardList, AlertTriangle, MessageSquare, Bot } from 'lucide-react';
+import { getAuthenticatedUser } from '@/lib/actions/auth.actions';
+import { getNurseDashboardData } from '@/lib/actions/nurse-dashboard.actions';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-export default function NurseDashboard() {
-  const pendingTasks = mockNurseTasks.filter(t => !t.isCompleted).length;
-  const criticalAlerts = mockNurseAssignedPatients.filter(p => p.condition === 'Critical').length;
+export default async function NurseDashboard() {
+  const user = await getAuthenticatedUser();
+  if (!user || user.role !== 'nurse') {
+    return (
+        <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Unauthorized</AlertTitle>
+            <AlertDescription>You do not have permission to view this page.</AlertDescription>
+        </Alert>
+    );
+  }
+
+  const { assignedPatients, assignedTasks, pendingTasksCount, criticalAlertsCount } = await getNurseDashboardData(user.uid);
 
   return (
     <div className="animate-fade-in-up space-y-6">
       <PageHeader
         title="Nurse Command Center"
-        description="Welcome, Nurse Kai. Here is your shift overview."
+        description={`Welcome, ${user.fullName}. Here is your shift overview.`}
         actions={<Button variant="outline"><MessageSquare className="mr-2 h-4 w-4" /> Message Doctor</Button>}
       />
       
@@ -28,7 +40,7 @@ export default function NurseDashboard() {
                 <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{mockNurseAssignedPatients.length}</div>
+                <div className="text-2xl font-bold">{assignedPatients.length}</div>
                 <p className="text-xs text-muted-foreground">Currently under your care</p>
             </CardContent>
         </GlowingCard>
@@ -38,7 +50,7 @@ export default function NurseDashboard() {
                 <ClipboardList className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{pendingTasks}</div>
+                <div className="text-2xl font-bold">{pendingTasksCount}</div>
                  <p className="text-xs text-muted-foreground">To be completed this shift</p>
             </CardContent>
         </GlowingCard>
@@ -48,7 +60,7 @@ export default function NurseDashboard() {
                 <AlertTriangle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold">{criticalAlerts}</div>
+                <div className="text-2xl font-bold">{criticalAlertsCount}</div>
                  <p className="text-xs text-muted-foreground">Patients needing immediate attention</p>
             </CardContent>
         </GlowingCard>
@@ -78,11 +90,11 @@ export default function NurseDashboard() {
                         <TableHead>Room</TableHead>
                         <TableHead>Patient Name</TableHead>
                         <TableHead>Condition</TableHead>
-                        <TableHead>Vitals</TableHead>
+                        <TableHead>Vitals (HR | BP)</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
-                    {mockNurseAssignedPatients.map(patient => (
+                    {assignedPatients.length > 0 ? assignedPatients.map(patient => (
                         <TableRow key={patient.id}>
                         <TableCell>{patient.room}</TableCell>
                         <TableCell>{patient.name}</TableCell>
@@ -93,10 +105,14 @@ export default function NurseDashboard() {
                             </Badge>
                         </TableCell>
                         <TableCell className="text-xs">
-                           HR: {patient.vitals.hr} | BP: {patient.vitals.bp}
+                           {patient.vitals ? `HR: ${patient.vitals.hr} | BP: ${patient.vitals.bp}` : 'N/A'}
                         </TableCell>
                         </TableRow>
-                    ))}
+                    )) : (
+                        <TableRow>
+                            <TableCell colSpan={4} className="h-24 text-center">No patients assigned to your ward.</TableCell>
+                        </TableRow>
+                    )}
                     </TableBody>
                 </Table>
                 </CardContent>
@@ -110,7 +126,7 @@ export default function NurseDashboard() {
                 </CardHeader>
                 <CardContent>
                 <div className="space-y-4">
-                    {mockNurseTasks.slice(0, 5).map(task => (
+                    {assignedTasks.length > 0 ? assignedTasks.slice(0, 5).map(task => (
                     <div key={task.id} className={cn("flex items-center gap-3 p-2 rounded-md", task.isCompleted ? 'bg-secondary/50 opacity-60' : '')}>
                         <Checkbox id={`task-${task.id}`} checked={task.isCompleted} />
                         <div>
@@ -121,7 +137,12 @@ export default function NurseDashboard() {
                             {task.priority}
                         </Badge>
                     </div>
-                    ))}
+                    )) : (
+                        <div className="text-center py-10 text-muted-foreground">
+                            <ClipboardList className="mx-auto h-8 w-8 mb-2" />
+                            <p className="text-sm">No tasks assigned.</p>
+                        </div>
+                    )}
                 </div>
                 </CardContent>
             </GlowingCard>
