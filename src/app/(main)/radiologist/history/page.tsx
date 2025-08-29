@@ -5,11 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockScanRequests } from '@/lib/data';
-import { Search, Download } from 'lucide-react';
+import { getRadiologistDashboardData } from '@/lib/actions/radiologist-dashboard.actions';
+import { Search, Download, FileText } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
-export default function RadiologistHistoryPage() {
+export default async function RadiologistHistoryPage({ searchParams }: { searchParams?: { query?: string } }) {
+  const query = searchParams?.query || '';
+  const { allScans } = await getRadiologistDashboardData(query);
+  
   return (
     <div className="animate-fade-in-up">
       <PageHeader
@@ -27,8 +30,10 @@ export default function RadiologistHistoryPage() {
               </CardDescription>
             </div>
             <div className="relative w-full max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by patient, doctor, or scan ID..." className="pl-9" />
+                <form>
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Search by patient, doctor, or scan ID..." className="pl-9" name="query" defaultValue={query} />
+                </form>
             </div>
           </div>
         </CardHeader>
@@ -45,7 +50,7 @@ export default function RadiologistHistoryPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockScanRequests.map(scan => (
+                {allScans.length > 0 ? allScans.map(scan => (
                   <TableRow key={scan.id}>
                     <TableCell>
                       <div className="font-medium">{scan.patientName}</div>
@@ -62,10 +67,16 @@ export default function RadiologistHistoryPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm">View Report</Button>
+                      <Button variant="outline" size="sm"><FileText className="mr-2 h-4 w-4"/>View Report</Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">
+                            No archived scans found for the current search query.
+                        </TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
           </ScrollArea>
