@@ -5,6 +5,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -108,4 +109,15 @@ export type PharmacistInventoryItem = {
     quantity: number;
     status: 'In Stock' | 'Low Stock' | 'Out of Stock';
     lastRestock: string;
+};
+
+export type ScanRequest = {
+    id: string;
+    patientName: string;
+    patientId: string;
+    scanType: string;
+    requestingDoctor: string;
+    status: 'Pending' | 'Reviewed' | 'Needs Re-scan';
+    requestDate: string;
+    imageUrl: string;
 };

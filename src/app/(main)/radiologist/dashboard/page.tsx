@@ -4,19 +4,31 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from '@/component
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockRadiologist, mockScanRequests } from '@/lib/data';
-import { FileClock, Scan, CheckCircle2, Bot, Upload } from 'lucide-react';
+import { FileClock, Scan, CheckCircle2, Bot, Upload, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
+import { getAuthenticatedUser } from '@/lib/actions/auth.actions';
+import { getRadiologistDashboardData } from '@/lib/actions/radiologist-dashboard.actions';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
-export default function RadiologistDashboard() {
-  const pendingScans = mockScanRequests.filter(s => s.status === 'Pending').length;
-  const reviewedToday = mockScanRequests.filter(s => s.status === 'Reviewed').length; // Mock data
+export default async function RadiologistDashboard() {
+  const user = await getAuthenticatedUser();
+  if (!user || user.role !== 'radiologist') {
+    return (
+        <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Unauthorized</AlertTitle>
+            <AlertDescription>You do not have permission to view this page.</AlertDescription>
+        </Alert>
+    );
+  }
+
+  const { allScans, pendingCount, reviewedTodayCount } = await getRadiologistDashboardData();
 
   return (
     <div className="animate-fade-in-up space-y-6">
       <PageHeader
         title="Radiology Command Center"
-        description={`Welcome, ${mockRadiologist.name}. Here are the latest scan requests.`}
+        description={`Welcome, ${user.fullName}. Here are the latest scan requests.`}
         actions={
           <div className="flex gap-2">
             <Button variant="outline"><Bot className="mr-2 h-4 w-4" /> AI Assist</Button>
@@ -32,7 +44,7 @@ export default function RadiologistDashboard() {
             <FileClock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingScans}</div>
+            <div className="text-2xl font-bold">{pendingCount}</div>
             <p className="text-xs text-muted-foreground">Awaiting review and report</p>
           </CardContent>
         </GlowingCard>
@@ -42,7 +54,7 @@ export default function RadiologistDashboard() {
             <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{reviewedToday}</div>
+            <div className="text-2xl font-bold">{reviewedTodayCount}</div>
             <p className="text-xs text-muted-foreground">Sent to referring doctors</p>
           </CardContent>
         </GlowingCard>
@@ -52,7 +64,7 @@ export default function RadiologistDashboard() {
             <Scan className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockScanRequests.length}</div>
+            <div className="text-2xl font-bold">{allScans.length}</div>
             <p className="text-xs text-muted-foreground">Across all imaging types</p>
           </CardContent>
         </GlowingCard>
@@ -63,42 +75,49 @@ export default function RadiologistDashboard() {
           <CardTitle>Scan Request Queue</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Patient</TableHead>
-                <TableHead>Scan Type</TableHead>
-                <TableHead>Requesting Doctor</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockScanRequests.map(scan => (
-                <TableRow key={scan.id}>
-                  <TableCell>
-                    <div className="font-medium">{scan.patientName}</div>
-                    <div className="text-xs text-muted-foreground">{scan.patientId}</div>
-                  </TableCell>
-                  <TableCell>{scan.scanType}</TableCell>
-                  <TableCell>{scan.requestingDoctor}</TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={scan.status === 'Reviewed' ? 'default' : scan.status === 'Pending' ? 'secondary' : 'destructive'}
-                      className={scan.status === 'Reviewed' ? 'bg-green-600/80' : ''}
-                    >
-                      {scan.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href="/radiologist/review">Review</Link>
-                    </Button>
-                  </TableCell>
+          {allScans.length > 0 ? (
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>Patient</TableHead>
+                    <TableHead>Scan Type</TableHead>
+                    <TableHead>Requesting Doctor</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                </TableHeader>
+                <TableBody>
+                {allScans.slice(0, 10).map(scan => (
+                    <TableRow key={scan.id}>
+                    <TableCell>
+                        <div className="font-medium">{scan.patientName}</div>
+                        <div className="text-xs text-muted-foreground">{scan.patientId}</div>
+                    </TableCell>
+                    <TableCell>{scan.scanType}</TableCell>
+                    <TableCell>{scan.requestingDoctor}</TableCell>
+                    <TableCell>
+                        <Badge 
+                        variant={scan.status === 'Reviewed' ? 'default' : scan.status === 'Pending' ? 'secondary' : 'destructive'}
+                        className={scan.status === 'Reviewed' ? 'bg-green-600/80' : ''}
+                        >
+                        {scan.status}
+                        </Badge>
+                    </TableCell>
+                    <TableCell>
+                        <Button variant="outline" size="sm" asChild>
+                            <Link href="/radiologist/review">Review</Link>
+                        </Button>
+                    </TableCell>
+                    </TableRow>
+                ))}
+                </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <Scan className="mx-auto h-12 w-12 mb-4" />
+              <p>The scan queue is currently empty.</p>
+            </div>
+          )}
         </CardContent>
       </GlowingCard>
     </div>
