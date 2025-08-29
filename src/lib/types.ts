@@ -4,6 +4,7 @@
 
 
 
+
 export type User = {
     uid: string;
     email: string;
@@ -98,4 +99,13 @@ export type PharmacistPrescription = {
     requestingDoctor: string;
     status: 'Pending' | 'Ready for Pickup' | 'Out of Stock' | 'Fulfilled';
     receivedDate: string;
+};
+
+export type PharmacistInventoryItem = {
+    id: string;
+    medicationName: string;
+    ndc: string; // National Drug Code
+    quantity: number;
+    status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+    lastRestock: string;
 };

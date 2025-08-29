@@ -4,12 +4,15 @@ import { CardContent, CardHeader, CardTitle, CardDescription } from '@/component
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { mockPharmacistPrescriptions } from '@/lib/data';
 import { Input } from '@/components/ui/input';
 import { Search, Check, X, MessageSquare } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { getPharmacistDashboardData } from '@/lib/actions/pharmacist-dashboard.actions';
 
-export default function PharmacistPrescriptionsPage() {
+export default async function PharmacistPrescriptionsPage({ searchParams }: { searchParams?: { query?: string } }) {
+  const query = searchParams?.query || '';
+  const { allPrescriptions } = await getPharmacistDashboardData(query);
+  
   return (
     <div className="animate-fade-in-up">
       <PageHeader
@@ -22,12 +25,14 @@ export default function PharmacistPrescriptionsPage() {
             <div>
               <CardTitle>All Prescriptions</CardTitle>
               <CardDescription>
-                {mockPharmacistPrescriptions.length} total prescriptions in the system.
+                {allPrescriptions.length} total prescriptions found for the current query.
               </CardDescription>
             </div>
             <div className="relative w-full max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search by patient, drug, or doctor..." className="pl-9" />
+                <form>
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Search by patient, drug, or doctor..." className="pl-9" name="query" defaultValue={query} />
+                </form>
             </div>
           </div>
         </CardHeader>
@@ -44,7 +49,7 @@ export default function PharmacistPrescriptionsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {mockPharmacistPrescriptions.map(rx => (
+                {allPrescriptions.length > 0 ? allPrescriptions.map(rx => (
                   <TableRow key={rx.id}>
                     <TableCell>
                       <div className="font-medium">{rx.patientName}</div>
@@ -81,7 +86,13 @@ export default function PharmacistPrescriptionsPage() {
                         </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) : (
+                    <TableRow>
+                        <TableCell colSpan={5} className="h-24 text-center">
+                            No prescriptions found.
+                        </TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
           </ScrollArea>

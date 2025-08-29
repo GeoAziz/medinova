@@ -2,7 +2,7 @@
 'use server';
 
 import { adminDb } from '@/lib/firebase-admin';
-import type { PharmacistPrescription } from '@/lib/types';
+import type { PharmacistPrescription, PharmacistInventoryItem } from '@/lib/types';
 
 export async function getPharmacistDashboardData(query?: string) {
   try {
@@ -60,4 +60,38 @@ export async function getPharmacistDashboardData(query?: string) {
         outOfStockCount: 0,
     };
   }
+}
+
+export async function getPharmacistInventoryData(query?: string) {
+    try {
+        const inventorySnapshot = await adminDb.collection('inventory').orderBy('medicationName', 'asc').get();
+        if (inventorySnapshot.empty) {
+            return [];
+        }
+
+        let inventoryItems: PharmacistInventoryItem[] = inventorySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                medicationName: data.medicationName,
+                ndc: data.ndc,
+                quantity: data.quantity,
+                status: data.status,
+                lastRestock: data.lastRestock.toDate().toLocaleDateString(),
+            };
+        });
+
+        if (query) {
+            const lowercasedQuery = query.toLowerCase();
+            inventoryItems = inventoryItems.filter(item => 
+                item.medicationName.toLowerCase().includes(lowercasedQuery) ||
+                item.ndc.toLowerCase().includes(lowercasedQuery)
+            );
+        }
+
+        return inventoryItems;
+    } catch (error) {
+        console.error('Error fetching pharmacist inventory data:', error);
+        return [];
+    }
 }
