@@ -1,10 +1,12 @@
+
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LogIn, Loader2 } from 'lucide-react';
+import { LogIn, Loader2, Eye, EyeOff } from 'lucide-react';
 import { getAuth, signInWithEmailAndPassword, type User } from 'firebase/auth';
 
 import { Button } from '@/components/ui/button';
@@ -31,6 +33,7 @@ type LoginValues = z.infer<typeof loginSchema>;
 export function AuthForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -111,9 +114,25 @@ export function AuthForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="********" {...field} />
-                  </FormControl>
+                   <div className="relative">
+                    <FormControl>
+                      <Input 
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="********" 
+                        {...field} 
+                        className="pr-10"
+                      />
+                    </FormControl>
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      size="icon" 
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-muted-foreground"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff /> : <Eye />}
+                    </Button>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
