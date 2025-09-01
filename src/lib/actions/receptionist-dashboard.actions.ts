@@ -17,10 +17,13 @@ export async function getReceptionistDashboardData() {
         const tomorrow = new Date(today);
         tomorrow.setDate(tomorrow.getDate() + 1);
 
+        if (!adminDb) {
+            throw new Error('adminDb is not initialized.');
+        }
         const appointmentsSnapshot = await adminDb.collectionGroup('appointments')
+            .orderBy('date', 'asc')
             .where('date', '>=', today.toISOString().split('T')[0])
             .where('date', '<', tomorrow.toISOString().split('T')[0])
-            .orderBy('date', 'asc')
             .get();
 
         if (appointmentsSnapshot.empty) {
@@ -38,6 +41,9 @@ export async function getReceptionistDashboardData() {
 
             if (!patientId) return null;
 
+            if (!adminDb) {
+                throw new Error('adminDb is not initialized.');
+            }
             const patientDoc = await adminDb.collection('users').doc(patientId).get();
             const patientName = patientDoc.exists ? patientDoc.data()?.fullName : 'Unknown Patient';
             
@@ -64,13 +70,22 @@ export async function getReceptionistDashboardData() {
             checkedInCount,
         };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching receptionist dashboard data:', error);
+        // If Firestore index error, provide link in returned object
+        let indexErrorLink = '';
+        if (error?.code === 9) {
+            // Replace with your actual project ID if needed
+            const projectId = 'zizo-health-verse';
+            indexErrorLink = `https://console.firebase.google.com/project/${projectId}/firestore/indexes?createIndex=collectionGroup&cg=appointments&fields=date:ASCENDING`;
+        }
         return {
             todaysAppointments: [],
             upcomingAppointmentsCount: 0,
             walkInsToday: 0,
             checkedInCount: 0,
+            indexErrorLink,
+            errorMessage: error?.message || String(error),
         };
     }
 }

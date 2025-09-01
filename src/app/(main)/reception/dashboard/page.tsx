@@ -24,15 +24,28 @@ export default async function ReceptionDashboard() {
     );
   }
 
-  const { 
-    todaysAppointments, 
+  const {
+    todaysAppointments,
     upcomingAppointmentsCount,
     walkInsToday,
     checkedInCount,
+    indexErrorLink,
+    errorMessage,
   } = await getReceptionistDashboardData();
 
   return (
     <div className="animate-fade-in-up space-y-6">
+      {indexErrorLink && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Firestore Index Required</AlertTitle>
+          <AlertDescription>
+            {errorMessage || 'A Firestore index is required for this query.'}
+            <br />
+            <Link href={indexErrorLink} target="_blank" className="text-blue-600 underline">Create Index in Firebase Console</Link>
+          </AlertDescription>
+        </Alert>
+      )}
       <PageHeader
         title="Reception Command Center"
         description={`Welcome, ${user.fullName}. Here's the front desk overview.`}
