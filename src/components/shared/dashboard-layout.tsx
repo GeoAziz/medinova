@@ -221,7 +221,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <Logo className="w-32" />
-              <SidebarTrigger className="ml-auto" />
+              {/* Sidebar trigger for desktop */}
+              <SidebarTrigger className="ml-auto hidden md:inline-flex" />
             </div>
           </SidebarHeader>
           <SidebarContent>
@@ -250,8 +251,10 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-            <header className="sticky top-0 z-30 flex h-16 items-center justify-end gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
+            <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm md:px-6">
+                {/* Sidebar trigger for mobile */}
                 <div className="flex items-center gap-4">
+                  <SidebarTrigger className="md:hidden mr-2" />
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative rounded-full">
