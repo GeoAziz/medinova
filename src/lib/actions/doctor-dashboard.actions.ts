@@ -66,10 +66,15 @@ export async function getDoctorDashboardData(doctorId: string) {
 export async function getDoctorBriefing(doctorName: string, patients: Patient[], appointments: Appointment[]) {
     try {
         const criticalPatientCount = patients.filter(p => p.condition === 'Critical').length;
-        const keyPatientNames = [
+        let keyPatientNames = [
             ...patients.filter(p => p.condition === 'Critical').map(p => p.name),
             ...appointments.map(a => a.patientName)
         ].slice(0, 2);
+
+        // If no key patients are found, provide a fallback to prevent AI flow from failing.
+        if (keyPatientNames.length === 0) {
+            keyPatientNames.push("your first patient");
+        }
 
         const result = await generateShiftBriefing({
             doctorName,
