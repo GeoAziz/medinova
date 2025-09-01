@@ -26,13 +26,20 @@ export async function getNurseDashboardData(nurseId: string) {
       ...doc.data(),
     })) as Patient[];
     
-    // 3. Fetch all tasks assigned to the nurse
-    const tasksQuery = adminDb.collection('tasks').where('assignedNurseId', '==', nurseId);
-    const tasksSnapshot = await tasksQuery.get();
-    const assignedTasks = tasksSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    })) as NurseTask[];
+    // 3. Fetch all tasks for the patients in that ward
+    let assignedTasks: NurseTask[] = [];
+    const patientIds = assignedPatients.map(p => p.id);
+
+    if (patientIds.length > 0) {
+        // Firestore 'in' queries are limited to 30 items. If more patients, this would need batching.
+        const tasksQuery = adminDb.collection('tasks').where('patientId', 'in', patientIds);
+        const tasksSnapshot = await tasksQuery.get();
+        assignedTasks = tasksSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        })) as NurseTask[];
+    }
+    
 
     // 4. Calculate stats
     const pendingTasksCount = assignedTasks.filter(t => !t.isCompleted).length;
