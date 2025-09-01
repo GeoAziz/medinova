@@ -1,4 +1,5 @@
 
+
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -42,7 +43,9 @@ export default async function ReceptionDashboard() {
           <AlertDescription>
             {errorMessage || 'A Firestore index is required for this query.'}
             <br />
-            <Link href={indexErrorLink} target="_blank" className="text-blue-600 underline">Create Index in Firebase Console</Link>
+            <a href={indexErrorLink} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-destructive-foreground">
+                Click here to create the required index in the Firebase Console.
+            </a>
           </AlertDescription>
         </Alert>
       )}

@@ -32,6 +32,8 @@ export async function getReceptionistDashboardData() {
                 upcomingAppointmentsCount: 0,
                 walkInsToday: 0, // Mocked for now
                 checkedInCount: 0, // Mocked for now
+                indexErrorLink: null,
+                errorMessage: null,
             };
         }
 
@@ -68,24 +70,32 @@ export async function getReceptionistDashboardData() {
             upcomingAppointmentsCount,
             walkInsToday,
             checkedInCount,
+            indexErrorLink: null,
+            errorMessage: null,
         };
 
     } catch (error: any) {
         console.error('Error fetching receptionist dashboard data:', error);
         // If Firestore index error, provide link in returned object
-        let indexErrorLink = '';
-        if (error?.code === 9) {
-            // Replace with your actual project ID if needed
-            const projectId = 'zizo-health-verse';
-            indexErrorLink = `https://console.firebase.google.com/project/${projectId}/firestore/indexes?createIndex=collectionGroup&cg=appointments&fields=date:ASCENDING`;
+        let indexErrorLink = null;
+        let errorMessage = 'An unexpected error occurred.';
+
+        if (error?.code === 9) { // FAILED_PRECONDITION
+             // Extract the project ID from the service account if available
+            const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'your-project-id';
+            indexErrorLink = `https://console.firebase.google.com/project/${projectId}/firestore/indexes?create_composite=EgtzYW1wbGVzGgRkYXRlGAEiAQAaDAoIZGF0ZUFzYxAB`;
+            errorMessage = `This query requires a Firestore index. Please click the link to create it in the Firebase Console. The query failed because of: ${error.details}`;
+        } else if (error.message) {
+            errorMessage = error.message;
         }
+
         return {
             todaysAppointments: [],
             upcomingAppointmentsCount: 0,
             walkInsToday: 0,
             checkedInCount: 0,
             indexErrorLink,
-            errorMessage: error?.message || String(error),
+            errorMessage,
         };
     }
 }
