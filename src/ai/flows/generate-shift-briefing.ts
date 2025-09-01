@@ -47,14 +47,15 @@ const prompt = ai.definePrompt({
 
   Construct a short, natural language summary. Start with a greeting.
   
-  - If there are appointments, mention the number.
   - If there are critical patients, highlight this as the top priority.
   - If there are no critical patients but there are appointments, mention the first patient.
-  - If there are no appointments and no patients, state that the schedule is clear.
+  - If there are no appointments but there are patients, mention that and the patient count.
+  - If there are no appointments AND no patients, state that the schedule is clear and they are on standby.
   
   Example if there are critical patients: "Good morning, Dr. {{{doctorName}}}. You have {{{appointmentCount}}} appointments scheduled today. Please prioritize your attention on the {{{criticalPatientCount}}} critical patients in your ward, including {{{patientNames.[0]}}}."
   Example if no critical patients: "Good morning, Dr. {{{doctorName}}}. You have a busy day with {{{appointmentCount}}} appointments. Your {{{patientCount}}} assigned patients are stable. First up is your consultation with {{{patientNames.[0]}}}"
-  Example if no appointments: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear for today. There are no appointments booked. You have {{{patientCount}}} patients under your care, all are currently stable."
+  Example if no appointments but patients exist: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear for today, with no appointments booked. You have {{{patientCount}}} patients under your care, all of whom are currently stable."
+  Example if no appointments AND no patients: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear and there are no patients assigned to you at the moment. Systems are online and you are on standby."
   `,
 });
 
