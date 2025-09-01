@@ -25,13 +25,13 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
         
         let role = 'patient'; // Default role
         if (pathname.startsWith('/doctor')) role = 'doctor';
-        if (pathname.startsWith('/admin')) role = 'admin';
-        if (pathname.startsWith('/nurse')) role = 'nurse';
-        if (pathname.startsWith('/lab')) role = 'lab_scientist';
-        if (pathname.startsWith('/pharmacist')) role = 'pharmacist';
-        if (pathname.startsWith('/reception')) role = 'receptionist';
-        if (pathname.startsWith('/radiologist')) role = 'radiologist';
-        if (pathname.startsWith('/medical-records')) role = 'medical_records_officer';
+        else if (pathname.startsWith('/admin')) role = 'admin';
+        else if (pathname.startsWith('/nurse')) role = 'nurse';
+        else if (pathname.startsWith('/lab')) role = 'lab_scientist';
+        else if (pathname.startsWith('/pharmacist')) role = 'pharmacist';
+        else if (pathname.startsWith('/reception')) role = 'receptionist';
+        else if (pathname.startsWith('/radiologist')) role = 'radiologist';
+        else if (pathname.startsWith('/medical-records')) role = 'medical_records_officer';
 
         const userSnapshot = await adminDb.collection('users').where('role', '==', role).limit(1).get();
         if (userSnapshot.empty) return null;
