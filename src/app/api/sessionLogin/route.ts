@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ status: 'success' });
     response.headers.set('Set-Cookie', `__session=${sessionCookie}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${expiresIn / 1000}`);
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('[SESSION LOGIN] Error creating session cookie:', error);
     return NextResponse.json({ error: 'Unauthorized', details: error?.message || error }, { status: 401 });
   }
