@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   name: 'generateShiftBriefingPrompt',
   input: {schema: GenerateShiftBriefingInputSchema},
   output: {schema: GenerateShiftBriefingOutputSchema},
-  prompt: `You are Zizo, an AI Medical Assistant. Your task is to provide a clear, concise, and friendly morning briefing for a doctor in the Zizo_MediVerse.
+  prompt: `You are Zizo, an AI Medical Assistant. Your task is to provide a clear, concise, and friendly morning briefing for a doctor in the Zizo_MediVerse. Be encouraging and professional.
 
   Use the following data to generate the briefing for Dr. {{{doctorName}}}:
   - Total Appointments Today: {{{appointmentCount}}}
@@ -45,10 +45,16 @@ const prompt = ai.definePrompt({
   - Critical Patients: {{{criticalPatientCount}}}
   - Key Patients Today: {{{patientNames}}}
 
-  Construct a short, natural language summary. Start with a greeting. Mention the number of appointments. If there are critical patients, highlight this as a priority. Mention one or two key patient names if relevant. Keep it brief and encouraging.
+  Construct a short, natural language summary. Start with a greeting.
+  
+  - If there are appointments, mention the number.
+  - If there are critical patients, highlight this as the top priority.
+  - If there are no critical patients but there are appointments, mention the first patient.
+  - If there are no appointments and no patients, state that the schedule is clear.
   
   Example if there are critical patients: "Good morning, Dr. {{{doctorName}}}. You have {{{appointmentCount}}} appointments scheduled today. Please prioritize your attention on the {{{criticalPatientCount}}} critical patients in your ward, including {{{patientNames.[0]}}}."
-  Example if there are no critical patients: "Good morning, Dr. {{{doctorName}}}. You have a busy day with {{{appointmentCount}}} appointments. Your {{{patientCount}}} assigned patients are stable. First up is your consultation with {{{patientNames.[0]}}}"
+  Example if no critical patients: "Good morning, Dr. {{{doctorName}}}. You have a busy day with {{{appointmentCount}}} appointments. Your {{{patientCount}}} assigned patients are stable. First up is your consultation with {{{patientNames.[0]}}}"
+  Example if no appointments: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear for today. There are no appointments booked. You have {{{patientCount}}} patients under your care, all are currently stable."
   `,
 });
 
