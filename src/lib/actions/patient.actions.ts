@@ -13,6 +13,7 @@ const patientSchema = z.object({
   age: z.coerce.number().min(0, 'Age must be a positive number'),
   gender: z.string().min(1, 'Gender is required'),
   room: z.string().min(1, 'Room assignment is required'),
+  ward: z.string().min(1, 'Ward is required'),
   nationalId: z.string().optional(),
   diagnosis: z.string().optional(),
   notes: z.string().optional(),

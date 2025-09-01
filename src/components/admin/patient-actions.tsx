@@ -35,6 +35,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '.
 import { Textarea } from '../ui/textarea';
 import { PatientDetailsSheet } from './patient-details-sheet';
 
+const wards = ["Cardiovascular Wing", "Neurology Unit", "Pediatric Ward", "General Medicine", "Surgical Ward", "Emergency Department"];
+
 type PatientActionsProps = 
   ( { mode: 'add'; doctors: Doctor[] } )
   | { mode: 'edit'; patient: Patient; doctors: Doctor[] };
@@ -59,7 +61,15 @@ export function PatientActions(props: PatientActionsProps) {
        toast({ title: 'Success!', description: state.message });
        setIsOpen(false);
     } else if (state.type === 'error') {
-      toast({ variant: 'destructive', title: 'Error', description: state.message });
+      toast({ variant: 'destructive', title: 'Error', description: state.message, ...state.errors && {
+        description: (
+            <ul>
+                {Object.entries(state.errors).map(([key, value]: [string, any]) => (
+                    <li key={key}>- {value.join(', ')}</li>
+                ))}
+            </ul>
+        )
+      } });
     }
   }, [state, toast, mode]);
 
@@ -141,21 +151,30 @@ export function PatientActions(props: PatientActionsProps) {
                             <Input id="room" name="room" defaultValue={defaultValues.room} required/>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="status">Status</Label>
-                            <Select name="status" defaultValue={defaultValues.status}>
-                                <SelectTrigger id="status">
-                                    <SelectValue placeholder="Select status..." />
-                                </SelectTrigger>
+                            <Label htmlFor="ward">Ward</Label>
+                            <Select name="ward" defaultValue={defaultValues.ward} required>
+                                <SelectTrigger id="ward"><SelectValue placeholder="Select ward..." /></SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="In-Patient">In-Patient</SelectItem>
-                                    <SelectItem value="Out-Patient">Out-Patient</SelectItem>
-                                    <SelectItem value="Critical">Critical</SelectItem>
-                                    <SelectItem value="Discharged">Discharged</SelectItem>
+                                    {wards.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
-                     <div className="space-y-2 md:col-span-2">
+                     <div className="space-y-2">
+                        <Label htmlFor="status">Status</Label>
+                        <Select name="status" defaultValue={defaultValues.status}>
+                            <SelectTrigger id="status">
+                                <SelectValue placeholder="Select status..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="In-Patient">In-Patient</SelectItem>
+                                <SelectItem value="Out-Patient">Out-Patient</SelectItem>
+                                <SelectItem value="Critical">Critical</SelectItem>
+                                <SelectItem value="Discharged">Discharged</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                     <div className="space-y-2">
                         <Label htmlFor="assignedDoctor">Assigned Doctor</Label>
                         <Select name="assignedDoctor" defaultValue={defaultValues.assignedDoctor}>
                             <SelectTrigger id="assignedDoctor">
