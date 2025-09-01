@@ -118,6 +118,30 @@ export type ScanRequest = {
     imageUrl: string;
 };
 
+export interface PatientData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  ssn?: string;
+  medicalRecordNumber: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  contact?: {
+    phone: string;
+    email: string;
+  };
+  insurance?: {
+    provider: string;
+    policyNumber: string;
+    groupNumber?: string;
+  };
+}
+
 export type ReceptionistAppointment = {
     id: string;
     patientName: string;

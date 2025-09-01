@@ -108,7 +108,7 @@ export default function BookAppointmentPage() {
   };
 
   return (
-    <div className="animate-fade-in-up">
+    <PageContainer>
       <PageHeader
         title="Book an Appointment"
         description="Follow the steps to schedule your next consultation."
@@ -205,6 +205,8 @@ export default function BookAppointmentPage() {
         )}
 
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

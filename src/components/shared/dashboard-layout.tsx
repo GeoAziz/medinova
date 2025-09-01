@@ -1,6 +1,7 @@
 
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -215,8 +216,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar collapsible="icon">
+      <div className="flex min-h-screen bg-background overflow-x-hidden w-full">
+        <Sidebar collapsible="icon" className="flex-shrink-0">
           <SidebarHeader>
             <div className="flex items-center gap-2">
               <Logo className="w-32" />
@@ -229,7 +230,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <SidebarMenuItem key={item.label}>
                   <Link href={item.href}>
                     <SidebarMenuButton isActive={isActive(item.href)} tooltip={item.label} disabled={item.disabled}>
-                      <item.icon />
+                      {React.createElement(item.icon)}
                       <span>{item.label}</span>
                     </SidebarMenuButton>
                   </Link>
@@ -285,7 +286,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   </div>
                 </div>
             </header>
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 p-4 md:p-6 w-full max-w-[100vw] overflow-x-hidden">
+            <div className="container mx-auto max-w-full">
+              {children}
+            </div>
+          </main>
         </SidebarInset>
       </div>
     </SidebarProvider>

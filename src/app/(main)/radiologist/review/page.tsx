@@ -14,13 +14,13 @@ export default function RadiologistReviewPage() {
   const currentScan = mockScanRequests[0];
 
   return (
-    <div className="animate-fade-in-up">
+    <PageContainer>
       <PageHeader
         title="Scan Review Room"
         description="Analyze imaging results and compile your report."
         actions={<Button><Send className="mr-2 h-4 w-4" /> Submit Report</Button>}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <GridContainer cols={{ default: 1, lg: 3 }}>
         <div className="lg:col-span-2">
           <GlowingCard>
             <CardHeader>
@@ -60,7 +60,7 @@ export default function RadiologistReviewPage() {
             </CardContent>
           </GlowingCard>
         </div>
-      </div>
+      </GridContainer>
        <div className="mt-6">
           <GlowingCard>
             <CardHeader>
@@ -92,6 +92,9 @@ export default function RadiologistReviewPage() {
             </CardContent>
           </GlowingCard>
        </div>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';
+import { GridContainer } from '@/components/shared/grid-container';

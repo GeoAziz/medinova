@@ -27,7 +27,7 @@ export default async function PharmacistDashboard() {
   const { allPrescriptions, pendingCount, readyForPickupCount, outOfStockCount } = await getPharmacistDashboardData();
 
   return (
-    <div className="animate-fade-in-up space-y-6">
+    <PageContainer className="space-y-6">
       <PageHeader
         title="Pharmacy Command Center"
         description={`Welcome, ${user.fullName}. Let's get these prescriptions fulfilled.`}
@@ -124,6 +124,8 @@ export default async function PharmacistDashboard() {
           )}
         </CardContent>
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

@@ -18,7 +18,7 @@ const mockReports = [
 
 export default function VisualizationPage() {
   return (
-    <div className="animate-fade-in-up">
+    <PageContainer>
       <PageHeader
         title="Zizo_HoloMed_Hub"
         description="Your interactive health visualization center."
@@ -125,6 +125,8 @@ export default function VisualizationPage() {
             </CardContent>
           </GlowingCard>
        </div>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

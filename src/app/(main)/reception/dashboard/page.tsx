@@ -35,7 +35,7 @@ export default async function ReceptionDashboard() {
   } = await getReceptionistDashboardData();
 
   return (
-    <div className="animate-fade-in-up space-y-6">
+    <PageContainer className="space-y-6">
       {errorMessage && (
         <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
@@ -149,6 +149,8 @@ export default async function ReceptionDashboard() {
           </Table>
         </CardContent>
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

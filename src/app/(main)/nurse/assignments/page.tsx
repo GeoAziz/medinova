@@ -28,7 +28,7 @@ export default async function NurseAssignmentsPage({ searchParams }: { searchPar
   const patients = await getDetailedPatientAssignments(user.uid, query);
 
   return (
-    <div className="animate-fade-in-up">
+    <PageContainer>
       <PageHeader
         title="Patient Assignments"
         description="Detailed view of all patients currently under your care."
@@ -56,8 +56,10 @@ export default async function NurseAssignmentsPage({ searchParams }: { searchPar
                 <p className="text-muted-foreground">No patients found. Try adjusting your search.</p>
               </div>
            ) : (
-            <Table>
-                <TableHeader>
+            <DataTableContainer>
+              <TableContainer>
+                <Table>
+                  <TableHeader>
                     <TableRow>
                     <TableHead>Patient</TableHead>
                     <TableHead>Room</TableHead>
@@ -92,10 +94,16 @@ export default async function NurseAssignmentsPage({ searchParams }: { searchPar
                     </TableRow>
                 ))}
                 </TableBody>
-            </Table>
+              </Table>
+            </TableContainer>
+          </DataTableContainer>
            )}
         </CardContent>
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';
+import { TableContainer } from '@/components/shared/table-container';
+import { DataTableContainer } from '@/components/shared/data-table-container';

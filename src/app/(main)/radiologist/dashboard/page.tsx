@@ -25,7 +25,7 @@ export default async function RadiologistDashboard() {
   const { allScans, pendingCount, reviewedTodayCount } = await getRadiologistDashboardData();
 
   return (
-    <div className="animate-fade-in-up space-y-6">
+    <PageContainer className="space-y-6">
       <PageHeader
         title="Radiology Command Center"
         description={`Welcome, ${user.fullName}. Here are the latest scan requests.`}
@@ -120,6 +120,8 @@ export default async function RadiologistDashboard() {
           )}
         </CardContent>
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

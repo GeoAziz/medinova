@@ -1,9 +1,14 @@
 import { cn } from "@/lib/utils";
-import { Card, type CardProps } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { ComponentProps } from "react";
 
-export function GlowingCard({ className, ...props }: CardProps) {
+interface GlowingCardProps extends ComponentProps<typeof Card> {
+  className?: string;
+}
+
+export function GlowingCard({ className, ...props }: GlowingCardProps) {
   return (
-    <div className="relative group">
+    <div className="relative group w-full h-full">
       <div className={cn(
           "absolute -inset-px bg-gradient-to-r from-primary to-accent rounded-lg blur-sm opacity-20",
           "group-hover:opacity-50 group-hover:blur transition duration-300 animate-tilt"

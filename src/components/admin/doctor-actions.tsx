@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useActionState } from 'react';
+import { useFormState } from 'react-dom';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -50,9 +50,34 @@ export function DoctorActions(props: DoctorActionsProps) {
 
   const { toast } = useToast();
 
-  const initialState: { message: string | null, errors?: any, type: string, link?: string | null } = { message: null, type: '' };
-  const action = mode === 'add' ? addDoctor : updateDoctor.bind(null, props.mode === 'edit' ? props.doctor.id : '');
-  const [state, dispatch] = useActionState(action, initialState);
+  type DoctorActionState = {
+    type: string;
+    message: string;
+    errors: {
+      name?: string[];
+      email?: string[];
+      specialty?: string[];
+      department?: string[];
+      bio?: string[];
+      schedule?: string[];
+    };
+    link?: string;
+  };
+
+  const initialState: DoctorActionState = {
+    type: '',
+    message: '',
+    errors: {},
+    link: undefined,
+  };
+  const action = async (state: DoctorActionState, formData: FormData): Promise<DoctorActionState> => {
+    if (mode === 'add') {
+      return await addDoctor(state, formData) as DoctorActionState;
+    } else {
+      return await updateDoctor(props.doctor.id, state, formData) as DoctorActionState;
+    }
+  };
+  const [state, dispatch] = useFormState(action, initialState);
 
   useEffect(() => {
     if (state.type === 'success' && mode === 'add') {

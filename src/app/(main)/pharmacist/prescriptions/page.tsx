@@ -48,7 +48,7 @@ export default function PharmacistPrescriptionsPage() {
   }, 300);
 
   return (
-    <div className="animate-fade-in-up">
+    <PageContainer>
       <PageHeader
         title="Prescription Queue"
         description="Search, view, and manage all incoming prescriptions."
@@ -75,8 +75,9 @@ export default function PharmacistPrescriptionsPage() {
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[60vh]">
-            <Table>
-              <TableHeader>
+            <TableContainer>
+              <Table>
+                <TableHeader>
                 <TableRow>
                   <TableHead>Patient</TableHead>
                   <TableHead>Medication</TableHead>
@@ -130,9 +131,13 @@ export default function PharmacistPrescriptionsPage() {
                 )}
               </TableBody>
             </Table>
+            </TableContainer>
           </ScrollArea>
         </CardContent>
       </GlowingCard>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';
+import { TableContainer } from '@/components/shared/table-container';

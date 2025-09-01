@@ -31,7 +31,7 @@ export default async function NurseDashboard() {
   const { assignedPatients, assignedTasks, pendingTasksCount, criticalAlertsCount } = await getNurseDashboardData(user.uid);
 
   return (
-    <div className="animate-fade-in-up space-y-6">
+    <PageContainer className="space-y-6">
       <PageHeader
         title="Nurse Command Center"
         description={`Welcome, ${user.fullName}. Here is your shift overview.`}
@@ -153,6 +153,8 @@ export default async function NurseDashboard() {
             </GlowingCard>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
+
+import { PageContainer } from '@/components/shared/page-container';

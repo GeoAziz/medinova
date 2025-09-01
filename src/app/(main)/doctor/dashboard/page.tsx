@@ -1,4 +1,5 @@
 
+import { PageContainer } from '@/components/shared/page-container';
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import Image from 'next/image';
 import { getAuthenticatedUser } from '@/lib/actions/auth.actions';
 import { getDoctorDashboardData, getDoctorBriefing } from '@/lib/actions/doctor-dashboard.actions';
 import { Badge } from '@/components/ui/badge';
+import { TableContainer } from '@/components/shared/table-container';
 
 export default async function DoctorDashboard() {
   const user = await getAuthenticatedUser();
@@ -25,7 +27,7 @@ export default async function DoctorDashboard() {
   const briefing = await getDoctorBriefing(user.fullName, assignedPatients, upcomingAppointments);
 
   return (
-    <div className="animate-fade-in-up space-y-6">
+    <PageContainer className="space-y-6">
       <PageHeader
         title={`Doctor's Console`}
         description={`Welcome, ${user.fullName}. Here is your operational overview.`}
@@ -53,7 +55,8 @@ export default async function DoctorDashboard() {
               <CardTitle>Assigned Patients</CardTitle>
               </CardHeader>
               <CardContent>
-              <Table>
+              <TableContainer>
+                <Table>
                   <TableHeader>
                   <TableRow>
                       <TableHead>Patient</TableHead>
@@ -88,6 +91,7 @@ export default async function DoctorDashboard() {
                   )}
                   </TableBody>
               </Table>
+              </TableContainer>
               </CardContent>
           </GlowingCard>
           
@@ -143,6 +147,6 @@ export default async function DoctorDashboard() {
           </GlowingCard>
           </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }
