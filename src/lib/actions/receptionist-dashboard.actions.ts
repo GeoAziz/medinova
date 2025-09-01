@@ -12,52 +12,37 @@ export async function getReceptionistDashboardData() {
         if (!adminDb) {
             throw new Error('adminDb is not initialized.');
         }
-        
-        const appointmentsSnapshot = await adminDb.collectionGroup('appointments')
-            .where('date_string', '==', todayString)
-            .get();
 
-        if (appointmentsSnapshot.empty) {
-            return {
-                todaysAppointments: [],
-                upcomingAppointmentsCount: 0,
-                walkInsToday: 0,
-                checkedInCount: 0,
-                errorMessage: null,
-                indexErrorLink: null,
-            };
+        // Query each user's appointments subcollection directly
+        const usersSnapshot = await adminDb.collection('users').get();
+        let allAppointments: ReceptionistAppointment[] = [];
+
+        for (const userDoc of usersSnapshot.docs) {
+            const appointmentsSnapshot = await adminDb
+                .collection('users')
+                .doc(userDoc.id)
+                .collection('appointments')
+                .where('date_string', '==', todayString)
+                .get();
+
+            appointmentsSnapshot.forEach(doc => {
+                const data = doc.data();
+                allAppointments.push({
+                    id: doc.id,
+                    patientName: userDoc.data().fullName,
+                    doctorName: data.doctor,
+                    time: data.time,
+                    status: data.status,
+                });
+            });
         }
 
-        const appointmentsPromises = appointmentsSnapshot.docs.map(async (doc) => {
-            const data = doc.data();
-            const patientId = doc.ref.parent.parent?.id;
-
-            if (!patientId) return null;
-
-            if (!adminDb) {
-                throw new Error('adminDb is not initialized.');
-            }
-            const patientDoc = await adminDb.collection('users').doc(patientId).get();
-            const patientName = patientDoc.exists ? patientDoc.data()?.fullName : 'Unknown Patient';
-            
-            return {
-                id: doc.id,
-                patientName: patientName,
-                doctorName: data.doctor,
-                time: data.time,
-                status: data.status,
-            } as ReceptionistAppointment;
-        });
-
-        const resolvedAppointments = await Promise.all(appointmentsPromises);
-        const todaysAppointments = resolvedAppointments.filter(Boolean) as ReceptionistAppointment[];
-
-        const upcomingAppointmentsCount = todaysAppointments.filter(a => a.status === 'Upcoming' || a.status === 'Confirmed').length;
-        const checkedInCount = todaysAppointments.filter(a => a.status === 'Checked-in' || a.status === 'Arrived').length;
+        const upcomingAppointmentsCount = allAppointments.filter(a => a.status === 'Upcoming' || a.status === 'Confirmed').length;
+        const checkedInCount = allAppointments.filter(a => a.status === 'Checked-in' || a.status === 'Arrived').length;
         const walkInsToday = 0;
 
         return {
-            todaysAppointments: todaysAppointments.sort((a,b) => a.time.localeCompare(b.time)),
+            todaysAppointments: allAppointments.sort((a,b) => a.time.localeCompare(b.time)),
             upcomingAppointmentsCount,
             walkInsToday,
             checkedInCount,
