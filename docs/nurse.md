@@ -19,6 +19,7 @@ I have successfully implemented the foundational UI for the Nurse "Command Cente
     *   It features **Ward Overview** cards at the top for an at-a-glance summary of assigned patients, pending tasks, and critical alerts, all populated by new mock data.
     *   A **Patient Assignments** table provides a quick list of patients currently under the nurse's care.
     *   A **Task List** offers a view of the most immediate tasks for the current shift.
+    *   An **AI Shift Handover** feature has been added, allowing nurses to generate structured handover reports from raw notes using a Genkit flow.
 
 3.  **Placeholder Pages for Core Features**:
     *   I have created the structural page files for the other key sections of the nurse portal:
@@ -46,7 +47,7 @@ Many of the most ambitious and immersive features require specialized libraries 
 
 3.  **Complex Animations & Transitions**:
     *   **Request**: Cinematic route transitions, glowing pulse effects, hover light trails, and slide-in panels.
-    *   **Current State**: Pages use a standard fade-in animation. The more advanced, immersive animations are not yet implemented.
+    *   **Current State**: Pages use a standard fade-in animation. The more advanced, immersive animations have not been implemented.
 
 4.  **Dedicated Feature Pages & Modals**:
     *   **Request**: A full-featured task manager with drag-and-drop, a vitals input panel, and a shift log/handover system.

@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview An AI agent to generate a daily briefing for a doctor.
+ * @fileOverview An AI agent to generate a shift handover briefing for a nurse.
  *
  * - generateShiftBriefing - A function that handles the briefing generation.
  * - GenerateShiftBriefingInput - The input type for the function.
@@ -12,18 +12,15 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateShiftBriefingInputSchema = z.object({
-  doctorName: z.string().describe("The doctor's name."),
-  appointmentCount: z.number().describe('The total number of appointments for the day.'),
-  patientCount: z.number().describe('The total number of patients assigned to the doctor.'),
-  criticalPatientCount: z.number().describe('The number of patients with a "Critical" status.'),
-  patientNames: z.array(z.string()).describe('A list of names for the most important patients to highlight.'),
+  notes: z.string().describe("The raw, unstructured notes from the nurse's shift."),
+  nurseName: z.string().describe("The name of the nurse submitting the notes."),
 });
 export type GenerateShiftBriefingInput = z.infer<typeof GenerateShiftBriefingInputSchema>;
 
 const GenerateShiftBriefingOutputSchema = z.object({
   briefing: z
     .string()
-    .describe('A concise, friendly, and professional briefing for the doctor, written in natural language.'),
+    .describe('A structured, concise, and professional handover report formatted in Markdown. It should include sections for "Key Events", "Pending Tasks", and "Patients to Watch".'),
 });
 export type GenerateShiftBriefingOutput = z.infer<typeof GenerateShiftBriefingOutputSchema>;
 
@@ -37,25 +34,17 @@ const prompt = ai.definePrompt({
   name: 'generateShiftBriefingPrompt',
   input: {schema: GenerateShiftBriefingInputSchema},
   output: {schema: GenerateShiftBriefingOutputSchema},
-  prompt: `You are Zizo, an AI Medical Assistant. Your task is to provide a clear, concise, and friendly morning briefing for a doctor in the Zizo_MediVerse. Be encouraging and professional.
+  prompt: `You are Zizo, an AI Medical Assistant. Your task is to take a nurse's raw shift notes and convert them into a structured, clear, and concise handover briefing for the next nurse.
 
-  Use the following data to generate the briefing for Dr. {{{doctorName}}}:
-  - Total Appointments Today: {{{appointmentCount}}}
-  - Assigned Patients: {{{patientCount}}}
-  - Critical Patients: {{{criticalPatientCount}}}
-  - Key Patients Today: {{{patientNames}}}
+  The handover report must be in Markdown format and contain the following sections:
+  - **Key Events**: A bulleted list of the most important events that occurred during the shift.
+  - **Pending Tasks**: A bulleted list of tasks that need to be completed by the next shift.
+  - **Patients to Watch**: A bulleted list of patients who require special attention, with a brief reason why.
 
-  Construct a short, natural language summary. Start with a greeting.
-  
-  - If there are critical patients, highlight this as the top priority.
-  - If there are no critical patients but there are appointments, mention the first patient.
-  - If there are no appointments but there are patients, mention that and the patient count.
-  - If there are no appointments AND no patients, state that the schedule is clear and they are on standby.
-  
-  Example if there are critical patients: "Good morning, Dr. {{{doctorName}}}. You have {{{appointmentCount}}} appointments scheduled today. Please prioritize your attention on the {{{criticalPatientCount}}} critical patients in your ward, including {{{patientNames.[0]}}}."
-  Example if no critical patients: "Good morning, Dr. {{{doctorName}}}. You have a busy day with {{{appointmentCount}}} appointments. Your {{{patientCount}}} assigned patients are stable. First up is your consultation with {{{patientNames.[0]}}}"
-  Example if no appointments but patients exist: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear for today, with no appointments booked. You have {{{patientCount}}} patients under your care, all of whom are currently stable."
-  Example if no appointments AND no patients: "Good morning, Dr. {{{doctorName}}}. Your schedule is clear and there are no patients assigned to you at the moment. Systems are online and you are on standby."
+  Analyze the following notes from {{{nurseName}}} and generate the report:
+  ---
+  {{{notes}}}
+  ---
   `,
 });
 

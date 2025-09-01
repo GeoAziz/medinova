@@ -6,10 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
-import { Users, ClipboardList, AlertTriangle, MessageSquare, Bot } from 'lucide-react';
+import { Users, ClipboardList, AlertTriangle, Bot, Send } from 'lucide-react';
 import { getAuthenticatedUser } from '@/lib/actions/auth.actions';
 import { getNurseDashboardData } from '@/lib/actions/nurse-dashboard.actions';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { ShiftBriefingModal } from '@/components/nurse/shift-briefing-modal';
 
 export default async function NurseDashboard() {
   const user = await getAuthenticatedUser();
@@ -30,7 +31,7 @@ export default async function NurseDashboard() {
       <PageHeader
         title="Nurse Command Center"
         description={`Welcome, ${user.fullName}. Here is your shift overview.`}
-        actions={<Button variant="outline"><MessageSquare className="mr-2 h-4 w-4" /> Message Doctor</Button>}
+        actions={<ShiftBriefingModal nurseName={user.fullName} />}
       />
       
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
