@@ -30,22 +30,17 @@ export default async function ReceptionDashboard() {
     upcomingAppointmentsCount,
     walkInsToday,
     checkedInCount,
-    indexErrorLink,
     errorMessage,
   } = await getReceptionistDashboardData();
 
   return (
     <div className="animate-fade-in-up space-y-6">
-      {indexErrorLink && (
+      {errorMessage && (
         <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Firestore Index Required</AlertTitle>
+          <AlertTitle>Error Loading Dashboard Data</AlertTitle>
           <AlertDescription>
-            {errorMessage || 'A Firestore index is required for this query.'}
-            <br />
-            <a href={indexErrorLink} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-destructive-foreground">
-                Click here to create the required index in the Firebase Console.
-            </a>
+            {errorMessage}
           </AlertDescription>
         </Alert>
       )}

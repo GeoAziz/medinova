@@ -47,13 +47,16 @@ export async function createAppointment(input: CreateAppointmentInput) {
         const appointmentRef = adminDb.collection('patients').doc(patientId).collection('appointments').doc();
         const eventRef = adminDb.collection('patients').doc(patientId).collection('patient_events').doc();
         
+        const appointmentDate = new Date(date);
+        
         const batch = adminDb.batch();
 
         batch.set(appointmentRef, {
             doctorId: doctor.id,
             doctor: doctor.name,
             specialty: doctor.specialty,
-            date: date,
+            date: appointmentDate,
+            date_string: appointmentDate.toISOString().split('T')[0], // For simple equality queries
             time: time,
             status: 'Upcoming',
             createdAt: admin.firestore.FieldValue.serverTimestamp()
@@ -62,13 +65,14 @@ export async function createAppointment(input: CreateAppointmentInput) {
         batch.set(eventRef, {
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
             eventType: 'APPOINTMENT_BOOKED',
-            description: `Appointment scheduled with ${doctor.name} for ${new Date(date).toLocaleDateString()} at ${time}.`,
+            description: `Appointment scheduled with ${doctor.name} for ${appointmentDate.toLocaleDateString()} at ${time}.`,
             actorId: patientId,
         });
 
         await batch.commit();
         
         revalidatePath('/patient/dashboard');
+        revalidatePath('/reception/dashboard');
         return { type: 'success', message: 'Appointment created successfully.' };
 
     } catch (error) {
