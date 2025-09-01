@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import { useEffect, useRef, useState } from 'react';
 import SplashPreloader from './components/SplashPreloader';
 import GlitchScanlineOverlay from './components/GlitchScanlineOverlay';
 import TerminalTypeText from './components/TerminalTypeText';
+import { useSplashSounds } from './components/useSplashSounds';
 
 const InteractiveGrid = () => {
   // Mouse-reactive grid overlay
@@ -38,6 +40,7 @@ const InteractiveGrid = () => {
   
 const Page = () => {
     const [preloaderDone, setPreloaderDone] = useState(false);
+    const { playSwoosh, playClick } = useSplashSounds(preloaderDone);
   
     return (
       <>
@@ -54,10 +57,11 @@ const Page = () => {
               <div className="mt-2 text-lg text-primary-foreground/80 md:text-xl animate-fade-in-up animation-delay-300">
                 <TerminalTypeText text="Revolutionizing Health Access with AI and Immersion" />
               </div>
-              <Link href="/auth" className="mt-12">
+              <Link href="/auth" className="mt-12" onClick={playClick}>
                 <Button
                   size="lg"
                   className="group relative bg-primary/90 text-primary-foreground transition-all duration-300 hover:bg-primary hover:shadow-[0_0_20px_hsl(var(--primary))] animate-fade-in-up animation-delay-600 animate-pulse-glow"
+                   onMouseEnter={playSwoosh}
                 >
                   Enter
                   <MoveRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -70,11 +74,11 @@ const Page = () => {
             </div>
   
             <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onMouseEnter={playSwoosh}>
                 <Languages className="h-5 w-5" />
                 <span className="sr-only">Language</span>
               </Button>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onMouseEnter={playSwoosh}>
                 <Accessibility className="h-5 w-5" />
                 <span className="sr-only">Accessibility</span>
               </Button>
@@ -86,3 +90,4 @@ const Page = () => {
   };
   
   export default Page;
+
