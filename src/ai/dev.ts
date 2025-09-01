@@ -8,3 +8,4 @@ import '@/ai/flows/diagnose-condition.ts';
 import '@/ai/flows/generate-lab-summary.ts';
 import '@/ai/flows/generate-shift-briefing.ts';
 import '@/ai/flows/analyze-lab-image.ts';
+import '@/ai/flows/check-drug-interactions.ts';
