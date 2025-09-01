@@ -1,12 +1,4 @@
 
-
-
-
-
-
-
-
-
 export type User = {
     uid: string;
     email: string;
@@ -85,11 +77,13 @@ export type RecordAccessRequest = {
 
 export type NurseTask = {
     id: string;
+    patientId: string;
     patientName: string;
     patientRoom: string;
     task: string;
     priority: 'High' | 'Medium' | 'Low';
     isCompleted: boolean;
+    dueDate: any;
 };
 
 export type PharmacistPrescription = {

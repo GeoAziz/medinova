@@ -80,6 +80,9 @@ async function createUsersAndData() {
   });
 
   const createdUsers = await Promise.all(userCreationPromises);
+  const patientUsers = createdUsers.filter(u => u.role === 'patient');
+  const doctorUsers = createdUsers.filter(u => u.role === 'doctor');
+  const nurseUsers = createdUsers.filter(u => u.role === 'nurse');
 
   // --- Seed specific records for our main test users ---
   const mainRecordPromises = createdUsers.map(async (user) => {
@@ -100,7 +103,10 @@ async function createUsersAndData() {
         name: user.fullName,
         age: 28,
         gender: "Male",
-        room: "Cryo-Pod 7",
+        ward: 'Cardiovascular Wing',
+        room: "301-A",
+        condition: "Stable",
+        vitals: { hr: 72, bp: '120/80', temp: 36.8 },
         createdAt: admin.firestore.Timestamp.now(),
       }, { merge: true });
        console.log(`❤️ Created primary record for ${user.fullName}`);
@@ -185,6 +191,7 @@ async function createUsersAndData() {
       name: `${getRandomItem(["Ava", "Isabella", "Sophia", "Mia", "Charlotte"])} ${getRandomItem(["Garcia", "Miller", "Davis", "Rodriguez", "Martinez"])}`,
       age: getRandomInt(18, 80),
       gender: getRandomItem(["Male", "Female", "Other"]),
+      ward: getRandomItem(wards),
       room: `Room ${getRandomInt(100, 500)}`,
       createdAt: admin.firestore.Timestamp.fromDate(getRandomDate(new Date(2022, 0, 1), new Date())),
     })),
@@ -234,7 +241,17 @@ async function createUsersAndData() {
       message: `System check complete. Module ${i + 1} nominal.`,
       level: i % 3 === 0 ? "ERROR" : i % 2 === 0 ? "WARN" : "INFO",
       timestamp: admin.firestore.Timestamp.fromMillis(Date.now() - (10 - i) * 60000),
-    }))
+    })),
+    seedCollection('tasks', 20, (i) => {
+      const patient = getRandomItem(patientUsers);
+      return {
+        patientId: patient.uid,
+        task: getRandomItem(['Administer medication', 'Check vitals', 'Update chart', 'Assist with ambulation', 'Change dressings']),
+        priority: getRandomItem(['High', 'Medium', 'Low']),
+        isCompleted: Math.random() > 0.5,
+        dueDate: admin.firestore.Timestamp.fromDate(getRandomDate(new Date(), new Date(Date.now() + 24 * 60 * 60 * 1000))),
+      }
+    }),
   ];
 
   await Promise.all(seedPromises);

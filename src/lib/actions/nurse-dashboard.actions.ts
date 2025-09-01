@@ -3,6 +3,7 @@
 
 import { adminDb } from '@/lib/firebase-admin';
 import type { Patient, NurseTask } from '@/lib/types';
+import { revalidatePath } from 'next/cache';
 
 export async function getNurseDashboardData(nurseId: string) {
   try {
@@ -34,10 +35,16 @@ export async function getNurseDashboardData(nurseId: string) {
         // Firestore 'in' queries are limited to 30 items. If more patients, this would need batching.
         const tasksQuery = adminDb.collection('tasks').where('patientId', 'in', patientIds);
         const tasksSnapshot = await tasksQuery.get();
-        assignedTasks = tasksSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        })) as NurseTask[];
+        assignedTasks = tasksSnapshot.docs.map(doc => {
+            const data = doc.data();
+            const patient = assignedPatients.find(p => p.id === data.patientId);
+            return {
+                id: doc.id,
+                ...data,
+                patientName: patient?.name || 'Unknown Patient',
+                patientRoom: patient?.room || 'N/A',
+            }
+        }) as NurseTask[];
     }
     
 
@@ -61,4 +68,44 @@ export async function getNurseDashboardData(nurseId: string) {
       criticalAlertsCount: 0,
     };
   }
+}
+
+export async function getDetailedPatientAssignments(nurseId: string, query?: string) {
+    const { assignedPatients } = await getNurseDashboardData(nurseId);
+    if (query) {
+        const lowercasedQuery = query.toLowerCase();
+        return assignedPatients.filter(p => 
+            p.name.toLowerCase().includes(lowercasedQuery) ||
+            p.room.toLowerCase().includes(lowercasedQuery) ||
+            p.condition?.toLowerCase().includes(lowercasedQuery)
+        );
+    }
+    return assignedPatients;
+}
+
+export async function getAllAssignedTasks(nurseId: string, query?: string) {
+    const { assignedTasks } = await getNurseDashboardData(nurseId);
+     if (query) {
+        const lowercasedQuery = query.toLowerCase();
+        return assignedTasks.filter(t =>
+            t.task.toLowerCase().includes(lowercasedQuery) ||
+            t.patientName.toLowerCase().includes(lowercasedQuery) ||
+            t.priority.toLowerCase().includes(lowercasedQuery)
+        );
+    }
+    return assignedTasks;
+}
+
+export async function toggleTaskCompletion(taskId: string, isCompleted: boolean) {
+    try {
+        await adminDb.collection('tasks').doc(taskId).update({
+            isCompleted: isCompleted,
+        });
+        revalidatePath('/nurse/tasks');
+        revalidatePath('/nurse/dashboard');
+        return { type: 'success', message: 'Task status updated.' };
+    } catch (error) {
+        console.error('Error updating task:', error);
+        return { type: 'error', message: 'Database Error: Failed to update task.' };
+    }
 }

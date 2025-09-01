@@ -1,3 +1,4 @@
+
 import { PageHeader } from '@/components/shared/page-header';
 import { GlowingCard } from '@/components/shared/glowing-card';
 import { CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,11 +14,15 @@ export default function NurseMonitoringPage() {
       <GlowingCard>
         <CardHeader>
           <CardTitle>3D Hospital Floor Plan</CardTitle>
-          <CardDescription>An interactive 3D model of the hospital wing will be displayed here.</CardDescription>
+          <CardDescription>This feature is under development. An interactive 3D model of the hospital wing will be displayed here.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-96 border-2 border-dashed rounded-lg bg-secondary/30">
-            <Image src="https://placehold.co/800x400.png" alt="3D Floor Plan Placeholder" width={800} height={400} className="opacity-30" data-ai-hint="floor plan" />
+            <div className='text-center text-muted-foreground'>
+              <p className="font-bold text-lg">3D Visualization Placeholder</p>
+              <p className='text-sm'>(Requires react-three-fiber and real-time data integration)</p>
+               <Image src="https://placehold.co/800x400.png" alt="3D Floor Plan Placeholder" width={800} height={400} className="opacity-10 mt-4 rounded-lg" data-ai-hint="floor plan" />
+            </div>
           </div>
         </CardContent>
       </GlowingCard>
