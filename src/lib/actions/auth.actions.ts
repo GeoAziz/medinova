@@ -15,7 +15,7 @@ type AuthenticatedUser = {
 // This is a simplified way to get the user on the server.
 // In a real app, you'd want a more robust session management solution.
 export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> {
-    const headerList = headers();
+    const headerList = await headers();
     const sessionCookie = headerList.get('cookie')?.split('; ').find(c => c.startsWith('__session='));
 
     if (!sessionCookie) {
@@ -33,6 +33,10 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
         else if (pathname.startsWith('/radiologist')) role = 'radiologist';
         else if (pathname.startsWith('/medical-records')) role = 'medical_records_officer';
 
+        if (!adminDb) {
+            console.error('adminDb is null');
+            return null;
+        }
         const userSnapshot = await adminDb.collection('users').where('role', '==', role).limit(1).get();
         if (userSnapshot.empty) return null;
         
@@ -48,11 +52,15 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     const token = sessionCookie.split('=')[1];
 
     if (!token) {
-        return null;
-    }
+        console.log('[AUTH] No token found in session cookie.');
+        return null;}
 
     try {
         const decodedToken = await getAuth().verifySessionCookie(token, true);
+        if (!adminDb) {
+            console.error('adminDb is null');
+            return null;
+        }
         const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
         if (!userDoc.exists) return null;
 
