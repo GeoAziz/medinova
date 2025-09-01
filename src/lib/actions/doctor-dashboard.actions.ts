@@ -3,6 +3,7 @@
 
 import { adminDb } from '@/lib/firebase-admin';
 import type { Patient, Appointment } from '@/lib/types';
+import { generateShiftBriefing } from '@/ai/flows/generate-shift-briefing';
 
 export async function getDoctorDashboardData(doctorId: string) {
   try {
@@ -51,7 +52,7 @@ export async function getDoctorDashboardData(doctorId: string) {
 
     return {
       assignedPatients,
-      upcomingAppointments: upcomingAppointments.sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
+      upcomingAppointments: upcomingAppointments.sort((a,b) => a.time.localeCompare(b.time)),
     };
   } catch (error) {
     console.error('Error fetching doctor dashboard data:', error);
@@ -60,4 +61,27 @@ export async function getDoctorDashboardData(doctorId: string) {
       upcomingAppointments: [],
     };
   }
+}
+
+export async function getDoctorBriefing(doctorName: string, patients: Patient[], appointments: Appointment[]) {
+    try {
+        const criticalPatientCount = patients.filter(p => p.condition === 'Critical').length;
+        const keyPatientNames = [
+            ...patients.filter(p => p.condition === 'Critical').map(p => p.name),
+            ...appointments.map(a => a.patientName)
+        ].slice(0, 2);
+
+        const result = await generateShiftBriefing({
+            doctorName,
+            appointmentCount: appointments.length,
+            patientCount: patients.length,
+            criticalPatientCount,
+            patientNames: keyPatientNames,
+        });
+
+        return result.briefing;
+    } catch(error) {
+        console.error("Failed to generate AI briefing:", error);
+        return "Could not load AI briefing at this time. Please check your schedule and patient list manually.";
+    }
 }
