@@ -13,16 +13,20 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ShiftBriefingModal } from '@/components/nurse/shift-briefing-modal';
 
 export default async function NurseDashboard() {
-  const user = await getAuthenticatedUser();
-  if (!user || user.role !== 'nurse') {
-    return (
-        <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Unauthorized</AlertTitle>
-            <AlertDescription>You do not have permission to view this page.</AlertDescription>
-        </Alert>
-    );
-  }
+    const user = await getAuthenticatedUser();
+    if (!user || user.role !== 'nurse') {
+        console.log('[NURSE DASHBOARD] Unauthorized access attempt:', {
+            user,
+            reason: !user ? 'No user returned from getAuthenticatedUser' : `User role is ${user.role}`
+        });
+        return (
+                <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Unauthorized</AlertTitle>
+                        <AlertDescription>You do not have permission to view this page.</AlertDescription>
+                </Alert>
+        );
+    }
 
   const { assignedPatients, assignedTasks, pendingTasksCount, criticalAlertsCount } = await getNurseDashboardData(user.uid);
 

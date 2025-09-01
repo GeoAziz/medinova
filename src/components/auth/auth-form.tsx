@@ -51,6 +51,18 @@ export function AuthForm() {
       const idTokenResult = await user.getIdTokenResult(true);
       const userRole = idTokenResult.claims.role;
 
+      // Set session cookie for server-side authentication
+      const idToken = await user.getIdToken();
+      const sessionRes = await fetch('/api/sessionLogin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+        credentials: 'include',
+      });
+      if (!sessionRes.ok) {
+        throw new Error('Failed to set session cookie.');
+      }
+
       if (userRole) {
         const roleToPath: { [key: string]: string } = {
             'admin': 'admin',

@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 export default async function NurseAssignmentsPage({ searchParams }: { searchParams?: { query?: string; } }) {
+  const awaitedSearchParams = typeof searchParams === 'undefined' ? undefined : await searchParams;
   const user = await getAuthenticatedUser();
   if (!user || user.role !== 'nurse') {
     return (
@@ -23,7 +24,7 @@ export default async function NurseAssignmentsPage({ searchParams }: { searchPar
     );
   }
   
-  const query = searchParams?.query || '';
+  const query = awaitedSearchParams?.query || '';
   const patients = await getDetailedPatientAssignments(user.uid, query);
 
   return (
