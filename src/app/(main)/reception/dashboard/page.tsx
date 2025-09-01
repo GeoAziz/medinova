@@ -31,6 +31,7 @@ export default async function ReceptionDashboard() {
     walkInsToday,
     checkedInCount,
     errorMessage,
+    indexErrorLink
   } = await getReceptionistDashboardData();
 
   return (
@@ -41,6 +42,11 @@ export default async function ReceptionDashboard() {
           <AlertTitle>Error Loading Dashboard Data</AlertTitle>
           <AlertDescription>
             {errorMessage}
+            {indexErrorLink && (
+              <Button asChild className="mt-2">
+                <a href={indexErrorLink} target="_blank" rel="noopener noreferrer">Create Firestore Index</a>
+              </Button>
+            )}
           </AlertDescription>
         </Alert>
       )}
