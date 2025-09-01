@@ -19,18 +19,30 @@ export async function getAuthenticatedUser(): Promise<AuthenticatedUser | null> 
     const sessionCookie = headerList.get('cookie')?.split('; ').find(c => c.startsWith('__session='));
 
     if (!sessionCookie) {
-        // This is a placeholder for a non-logged-in user on the server.
-        // In a real app, you'd likely have a proper auth flow.
-        // For now, let's return the default doctor for the dashboard.
-        const docSnapshot = await adminDb.collection('users').where('email', '==', 'doctor@zizoverse.io').limit(1).get();
-        if (docSnapshot.empty) return null;
-        const defaultDoctor = docSnapshot.docs[0].data();
+        // This is a placeholder for a non-logged-in user on the server, adapted for multi-role viewing.
+        // It checks the path to determine which mock user to return.
+        const pathname = headerList.get('next-url') || '';
+        
+        let role = 'patient'; // Default role
+        if (pathname.startsWith('/doctor')) role = 'doctor';
+        if (pathname.startsWith('/admin')) role = 'admin';
+        if (pathname.startsWith('/nurse')) role = 'nurse';
+        if (pathname.startsWith('/lab')) role = 'lab_scientist';
+        if (pathname.startsWith('/pharmacist')) role = 'pharmacist';
+        if (pathname.startsWith('/reception')) role = 'receptionist';
+        if (pathname.startsWith('/radiologist')) role = 'radiologist';
+        if (pathname.startsWith('/medical-records')) role = 'medical_records_officer';
+
+        const userSnapshot = await adminDb.collection('users').where('role', '==', role).limit(1).get();
+        if (userSnapshot.empty) return null;
+        
+        const defaultUser = userSnapshot.docs[0].data();
         return {
-            uid: docSnapshot.docs[0].id,
-            email: defaultDoctor.email,
-            role: defaultDoctor.role,
-            fullName: defaultDoctor.fullName,
-        }
+            uid: userSnapshot.docs[0].id,
+            email: defaultUser.email,
+            role: defaultUser.role,
+            fullName: defaultUser.fullName,
+        };
     }
     
     const token = sessionCookie.split('=')[1];
