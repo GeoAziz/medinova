@@ -15,10 +15,21 @@ import Image from 'next/image';
 
 async function getRecordsOfficers(query: string) {
   try {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'medical_records_officer').get();
     if (usersSnapshot.empty) return [];
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     if (query) {
       allUsers = allUsers.filter(user => 
@@ -26,12 +37,12 @@ async function getRecordsOfficers(query: string) {
         user.email.toLowerCase().includes(query.toLowerCase())
       );
     }
-    
+
     if (allUsers.length === 0) return [];
 
     const officerIds = allUsers.map(user => user.uid);
     const officersSnapshot = await adminDb.collection('medicalRecordsOfficers').where(admin.firestore.FieldPath.documentId(), 'in', officerIds).get();
-    
+
     const officersData = officersSnapshot.docs.reduce((acc, doc) => {
       acc[doc.id] = doc.data();
       return acc;
@@ -46,10 +57,10 @@ async function getRecordsOfficers(query: string) {
         recordAccessLogs: officerRecord.recordAccessLogs,
         reportsGenerated: officerRecord.reportsGenerated,
         imageURL: officerRecord.imageURL,
-        createdAt: user.createdAt?.toDate().toLocaleDateString() || 'N/A',
+        createdAt: user.createdAt?.toDate?.() ? user.createdAt.toDate().toLocaleDateString() : 'N/A',
       };
     }).sort((a, b) => a.name.localeCompare(b.name));
-    
+
     return combinedData;
 
   } catch (error) {
@@ -61,8 +72,9 @@ async function getRecordsOfficers(query: string) {
 export type RecordsOfficer = Exclude<Awaited<ReturnType<typeof getRecordsOfficers>>, null>[0];
 
 
-export default async function AdminRecordsOfficersPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminRecordsOfficersPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const officers = await getRecordsOfficers(query);
 
   if (officers === null) {

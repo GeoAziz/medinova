@@ -16,10 +16,20 @@ import Image from 'next/image';
 
 async function getNurses(query: string) {
   try {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'nurse').get();
     if (usersSnapshot.empty) return [];
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     if (query) {
       allUsers = allUsers.filter(user => 
@@ -62,8 +72,9 @@ async function getNurses(query: string) {
 
 export type Nurse = Exclude<Awaited<ReturnType<typeof getNurses>>, null>[0];
 
-export default async function AdminNursesPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminNursesPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const nurses = await getNurses(query);
 
   if (nurses === null) {

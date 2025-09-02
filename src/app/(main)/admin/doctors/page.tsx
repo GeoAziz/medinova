@@ -17,12 +17,22 @@ import Image from 'next/image';
 export async function getDoctors(query: string) {
   try {
     // 1. Fetch all users with the 'doctor' role
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'doctor').get();
     if (usersSnapshot.empty) {
       return [];
     }
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     // 2. Filter by search query if it exists
     if (query) {
@@ -73,8 +83,9 @@ export async function getDoctors(query: string) {
 export type Doctor = Exclude<Awaited<ReturnType<typeof getDoctors>>, null>[0];
 
 
-export default async function AdminDoctorsPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminDoctorsPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const doctors = await getDoctors(query);
 
   if (doctors === null) {

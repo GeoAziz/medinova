@@ -15,18 +15,17 @@ import type { User } from '@/lib/types';
 
 // Helper function to get data using the Admin SDK
 async function getUsers(query?: string) {
+    if (!adminDb) throw new Error("adminDb not initialized");
     let usersQuery = adminDb.collection('users').orderBy('fullName');
-    
     const usersSnapshot = await usersQuery.get();
-    
     let userList = usersSnapshot.docs.map(doc => {
         const data = doc.data();
         return {
             id: doc.id,
-            name: data.fullName,
-            email: data.email,
-            role: data.role,
-            registered: data.createdAt.toDate().toLocaleDateString(),
+            name: data.fullName ?? '',
+            email: data.email ?? '',
+            role: data.role ?? '',
+            registered: data.createdAt?.toDate?.() ? data.createdAt.toDate().toLocaleDateString() : '',
         } as (User & {id: string, registered: string, name: string});
     });
 
@@ -41,6 +40,7 @@ async function getUsers(query?: string) {
 }
 
 async function getSystemLogs() {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const logSnapshot = await adminDb.collection('systemLogs').orderBy('timestamp', 'desc').limit(10).get();
     const logList = logSnapshot.docs.map(doc => {
         const data = doc.data();
@@ -57,6 +57,7 @@ async function getSystemLogs() {
 async function getRoleCounts() {
     const roles = ['patient', 'doctor', 'nurse', 'pharmacist'];
     const counts: { [key: string]: number } = {};
+    if (!adminDb) throw new Error("adminDb not initialized");
     for (const role of roles) {
         // NOTE: In a real large-scale app, this would be inefficient.
         // You would typically maintain counters in a separate document.
@@ -67,11 +68,12 @@ async function getRoleCounts() {
 }
 
 
-export default async function AdminDashboard({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
-  const users = await getUsers(query);
-  const systemLogs = await getSystemLogs();
-  const roleCounts = await getRoleCounts();
+export default async function AdminDashboard({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+    const params = await searchParams;
+    const query = params?.query || '';
+    const users = await getUsers(query);
+    const systemLogs = await getSystemLogs();
+    const roleCounts = await getRoleCounts();
 
   return (
     <div className="animate-fade-in-up space-y-6">

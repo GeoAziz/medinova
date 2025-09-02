@@ -16,10 +16,20 @@ import Image from 'next/image';
 
 async function getReceptionists(query: string) {
   try {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'receptionist').get();
     if (usersSnapshot.empty) return [];
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     if (query) {
       allUsers = allUsers.filter(user => 
@@ -61,8 +71,9 @@ async function getReceptionists(query: string) {
 export type Receptionist = Exclude<Awaited<ReturnType<typeof getReceptionists>>, null>[0];
 
 
-export default async function AdminReceptionistsPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminReceptionistsPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const receptionists = await getReceptionists(query);
 
   if (receptionists === null) {

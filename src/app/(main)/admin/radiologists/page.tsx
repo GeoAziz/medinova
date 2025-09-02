@@ -15,10 +15,20 @@ import Image from 'next/image';
 
 async function getRadiologists(query: string) {
   try {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'radiologist').get();
     if (usersSnapshot.empty) return [];
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     if (query) {
       allUsers = allUsers.filter(user => 
@@ -61,8 +71,9 @@ async function getRadiologists(query: string) {
 export type Radiologist = Exclude<Awaited<ReturnType<typeof getRadiologists>>, null>[0];
 
 
-export default async function AdminRadiologistsPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminRadiologistsPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const radiologists = await getRadiologists(query);
 
   if (radiologists === null) {

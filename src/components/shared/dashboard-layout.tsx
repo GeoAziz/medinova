@@ -1,9 +1,11 @@
+"use client";
 
-'use client';
+
 
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+
 import {
   SidebarProvider,
   Sidebar,
@@ -147,61 +149,51 @@ const medicalRecordsOfficerNav: NavItem[] = [
 ];
 
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children, user }: { children: React.ReactNode, user: any }) {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   let navItems: NavItem[] = [];
-  let userRole: 'Patient' | 'Doctor' | 'Admin' | 'Lab Scientist' | 'Nurse' | 'Pharmacist' | 'Receptionist' | 'Radiologist' | 'Medical Records Officer' = 'Patient';
+  let userRole: string = 'Patient';
   let userName = 'Alex Ryder';
   let userInitial = 'AR';
-  
-  if (pathname.startsWith('/doctor')) {
-    navItems = doctorNav;
-    userRole = 'Doctor';
-    userName = 'Dr. Evelyn Reed';
-    userInitial = 'ER';
-  } else if (pathname.startsWith('/admin')) {
-    navItems = adminNav;
-    userRole = 'Admin';
-    userName = 'SysAdmin';
-    userInitial = 'SA';
-  } else if (pathname.startsWith('/lab')) {
-    navItems = labNav;
-    userRole = 'Lab Scientist';
-    userName = 'Lab Scientist 04';
-    userInitial = 'LS';
-  } else if (pathname.startsWith('/nurse')) {
-    navItems = nurseNav;
-    userRole = 'Nurse';
-    userName = 'Nurse Kai';
-    userInitial = 'NK';
-  } else if (pathname.startsWith('/pharmacist')) {
-    navItems = pharmacistNav;
-    userRole = 'Pharmacist';
-    userName = 'Riya Singh';
-    userInitial = 'RS';
-  } else if (pathname.startsWith('/reception')) {
-    navItems = receptionistNav;
-    userRole = 'Receptionist';
-    userName = 'Javier "Jay" Rios';
-    userInitial = 'JR';
-  } else if (pathname.startsWith('/radiologist')) {
-    navItems = radiologistNav;
-    userRole = 'Radiologist';
-    userName = 'Dr. Chloe Benali';
-    userInitial = 'CB';
-  } else if (pathname.startsWith('/medical-records')) {
-    navItems = medicalRecordsOfficerNav;
-    userRole = 'Medical Records Officer';
-    userName = 'Officer Z-X9';
-    userInitial = 'ZX';
+
+  if (user) {
+    userRole = user.role;
+    userName = user.fullName;
+    userInitial = user.fullName?.substring(0, 2) || 'AR';
+    switch (user.role) {
+      case 'doctor':
+        navItems = doctorNav;
+        break;
+      case 'admin':
+        navItems = adminNav;
+        break;
+      case 'lab_scientist':
+        navItems = labNav;
+        break;
+      case 'nurse':
+        navItems = nurseNav;
+        break;
+      case 'pharmacist':
+        navItems = pharmacistNav;
+        break;
+      case 'receptionist':
+        navItems = receptionistNav;
+        break;
+      case 'radiologist':
+        navItems = radiologistNav;
+        break;
+      case 'medical_records_officer':
+        navItems = medicalRecordsOfficerNav;
+        break;
+      default:
+        navItems = patientNav;
+        break;
+    }
   } else {
     navItems = patientNav;
-    userRole = 'Patient';
-    userName = 'Alex Ryder';
-    userInitial = 'AR';
   }
 
   const isActive = (href: string) => pathname === href;

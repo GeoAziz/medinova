@@ -15,10 +15,20 @@ import Image from 'next/image';
 
 async function getLabScientists(query: string) {
   try {
+    if (!adminDb) throw new Error("adminDb not initialized");
     const usersSnapshot = await adminDb.collection('users').where('role', '==', 'lab_scientist').get();
     if (usersSnapshot.empty) return [];
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     if (query) {
       allUsers = allUsers.filter(user => 
@@ -61,8 +71,9 @@ async function getLabScientists(query: string) {
 export type LabScientist = Exclude<Awaited<ReturnType<typeof getLabScientists>>, null>[0];
 
 
-export default async function AdminLabScientistsPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminLabScientistsPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const scientists = await getLabScientists(query);
 
   if (scientists === null) {

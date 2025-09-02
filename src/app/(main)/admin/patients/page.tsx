@@ -17,9 +17,19 @@ import { getDoctors } from '@/app/(main)/admin/doctors/page';
 async function getPatients(query: string) {
   try {
     // 1. Fetch all users with the 'patient' role
+    if (!adminDb) throw new Error("adminDb not initialized");
     let usersSnapshot = await adminDb.collection('users').where('role', '==', 'patient').get();
-    
-    let allUsers = usersSnapshot.docs.map(doc => ({ ...doc.data() } as User));
+    let allUsers = usersSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        uid: doc.id,
+        email: data.email ?? '',
+        role: data.role ?? '',
+        fullName: data.fullName ?? '',
+        profileImage: data.profileImage ?? '',
+        createdAt: data.createdAt,
+      } as User;
+    });
 
     // 2. Filter by search query if it exists
     if (query) {
@@ -73,8 +83,9 @@ async function getPatients(query: string) {
 export type Patient = Exclude<Awaited<ReturnType<typeof getPatients>>, null>[0];
 
 
-export default async function AdminPatientsPage({ searchParams }: { searchParams?: { query?: string; } }) {
-  const query = searchParams?.query || '';
+export default async function AdminPatientsPage({ searchParams }: { searchParams: Promise<{ query?: string }> }) {
+  const params = await searchParams;
+  const query = params?.query || '';
   const patients = await getPatients(query);
   const doctors = await getDoctors('');
 
